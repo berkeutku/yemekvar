@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* APPLE GLOBAL RENKLER & TİPOGRAFİ */
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-text-gray: #86868b;
+        --apple-border: #d2d2d7;
+    }
+
+    h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.04em; }
+
+    /* FİLTRELEME ÇUBUĞU */
+    .apple-filter-bar {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: saturate(180%) blur(20px);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        margin-bottom: 40px;
+    }
+    .apple-input {
+        background-color: rgba(0,0,0,0.04);
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--apple-dark);
+        width: 100%;
+        transition: all 0.3s;
+    }
+    .apple-input:focus {
+        background-color: #ffffff;
+        border-color: var(--apple-blue);
+        box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        outline: none;
+    }
+    .filter-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--apple-text-gray);
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    /* ARAMA SONUÇ KARTLARI (KORUNDU) */
+    .search-card { 
+        border-radius: 20px; 
+        border: none; 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04); 
+        background: #fff; 
+        transition: transform 0.3s ease, box-shadow 0.3s ease; 
+        overflow: hidden; 
+    }
+    .search-card:hover { 
+        transform: translateY(-5px); 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+    }
+    
+    .price-tag { 
+        font-size: 1.5rem; 
+        font-weight: 700; 
+        color: var(--apple-dark); 
+        letter-spacing: -1px; 
+    }
+    
+    /* BUTONLAR (KORUNDU) */
+    .btn-apple {
+        background: var(--apple-blue); 
+        color: #fff !important; 
+        border-radius: 50px; 
+        padding: 8px 22px; 
+        font-weight: 600; 
+        font-size: 14px; 
+        text-decoration: none; 
+        display: inline-block; 
+        transition: 0.3s; 
+        border: none;
+    }
+    .btn-apple:hover { 
+        background: var(--apple-blue-hover); 
+        transform: scale(1.02); 
+    }
+    
+    .btn-compare { 
+        background: var(--apple-light-bg); 
+        color: var(--apple-dark); 
+        border-radius: 50px; 
+        padding: 8px 16px; 
+        text-decoration: none; 
+        font-size: 14px; 
+        font-weight: 600;
+        transition: 0.2s; 
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-compare:hover { 
+        background: #e8e8ed; 
+    }
+
+    /* ROZETLER (KORUNDU) */
+    .apple-badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 50px;
+        background: #fdf6e3;
+        color: #d97706;
+        border: 1px solid rgba(217, 119, 6, 0.2);
+    }
+    
+    /* BOŞ DURUM (KORUNDU) */
+    .apple-empty-state {
+        background: #fff;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        padding: 60px 20px;
+        text-align: center;
+    }
+
+    /* YÜKLENİYOR ANİMASYONU (KORUNDU) */
+    .apple-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(0, 113, 227, 0.1);
+        border-top-color: var(--apple-blue);
+        border-radius: 50%;
+        animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        margin: 0 auto;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    #loading-indicator {
+        position: absolute;
+        top: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        background: rgba(255,255,255,0.9);
+        padding: 20px 40px;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        display: none;
+    }
+    #sonuclar-wrapper { position: relative; min-height: 300px; }
+</style>
+
+<div class="container py-5 mt-3">
+    
+    <div class="mb-5 text-center">
+        <h3 class="fw-bold" style="font-size: 2.5rem; color: var(--apple-dark);">Arama Sonuçları</h3>
+        <p class="text-secondary fs-5">"<span style="color: var(--apple-blue); font-weight: 600;">{{ query|default:"Tümü" }}</span>" için bulduğumuz premium eşleşmeler.</p>
+    </div>
+
+    <!-- FİLTRELEME ÇUBUĞU (AJAX İÇİN) -->
+    <form id="ajax-filter-form" method="GET" action="{% url 'arama' %}">
+        <div class="apple-filter-bar">
+            <!-- 3 Sütunlu Orijinal Tasarıma Dönüldü -->
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="filter-label"><i class="fas fa-search me-1"></i> Ne Arıyorsunuz?</label>
+                    <input type="text" name="q" class="apple-input" value="{{ query }}" placeholder="Menü veya firma adı yazın..." autocomplete="off">
+                </div>
+                <div class="col-md-4">
+                    <label class="filter-label"><i class="fas fa-map-marker-alt me-1"></i> Konum</label>
+                    <select name="konum" class="apple-input">
+                        <option value="">Tüm Şehirler</option>
+                        {% for sehir in sehirler_listesi %}
+                            <option value="{{ sehir }}" {% if secili_konum == sehir %}selected{% endif %}>{{ sehir }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="filter-label"><i class="fas fa-layer-group me-1"></i> Kategori</label>
+                    <select name="kategori_ara" class="apple-input">
+                        <option value="">Tüm Kategoriler</option>
+                        {% for hizmet in hizmetler %}
+                            <option value="{{ hizmet.id }}" {% if secili_kategori == hizmet.id|stringformat:"s" %}selected{% endif %}>{{ hizmet.baslik }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </form>
+    
+    <!-- YÜKLENİYOR (LOADING) GÖSTERGESİ -->
+    <div id="sonuclar-wrapper">
+        <div id="loading-indicator">
+            <div class="apple-spinner"></div>
+            <div class="mt-3 fw-bold text-muted small text-center">Sonuçlar Güncelleniyor...</div>
+        </div>
+
+        <!-- AJAX'IN İÇİNE YAZACAĞI ASIL DİV -->
+        <div id="ajax-sonuclar" style="transition: opacity 0.3s ease;">
+            
+            {% if paketler %}
+            <div class="mb-4 text-muted fw-bold">
+                <i class="fas fa-list"></i> Toplam {{ paketler|length }} sonuç listeleniyor.
+            </div>
+
+            <div class="row g-4">
+                {% for paket in paketler %}
+                <div class="col-md-4 mb-4">
+                    <div class="card search-card h-100 p-2">
+                        {% if paket.resim %}
+                        <img src="{{ paket.resim.url }}" class="card-img-top rounded-4" alt="{{ paket.isim }}" style="height: 220px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body p-4 d-flex flex-column">
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-secondary fw-bold" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    {{ paket.firma.isim }}
+                                </span>
+                            </div>
+                            
+                            <!-- B2B BAŞARI METRİKLERİ -->
+                            <div class="d-flex gap-2 mb-2 flex-wrap">
+                                <span class="badge bg-light text-dark border" style="font-size: 10px; font-weight: 600;">
+                                    <i class="fas fa-clock text-success me-1"></i> %{{ paket.firma.teslimat_basarisi|default:"98" }} Zamanında
+                                </span>
+                                <span class="badge bg-light text-dark border" style="font-size: 10px; font-weight: 600;">
+                                    <i class="fas fa-shield-alt text-primary me-1"></i> %{{ paket.firma.hijyen_uyumu|default:"100" }} Hijyen
+                                </span>
+                                <span class="badge bg-light text-dark border" style="font-size: 10px; font-weight: 600;">
+                                    <i class="fas fa-briefcase text-secondary me-1"></i> {{ paket.firma.tecrube_yili|default:"10" }} Yıl
+                                </span>
+                            </div>
+                            
+                            <h5 class="fw-bold text-dark fs-4 mb-2" style="letter-spacing: -1px;">{{ paket.isim }}</h5>
+                            
+                            {% if paket.firma.super_esnaf %}
+                            <div class="mb-3">
+                                <span class="apple-badge" title="Yüksek Müşteri Memnuniyeti">
+                                    <i class="fas fa-crown me-1"></i> Süper Esnaf
+                                </span>
+                            </div>
+                            {% endif %}
+                            
+                            <p class="text-muted small mb-4 flex-grow-1" style="font-size: 15px; line-height: 1.5;">{{ paket.aciklama|truncatechars:80 }}</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                <span class="price-tag">{{ paket.fiyat }} ₺</span>
+                                <div class="d-flex gap-2">
+                                    <!-- KARŞILAŞTIRMA BUTONU -->
+                                    <form method="post" action="{% url 'karsilastirmaya_ekle' paket.slug %}" class="m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-compare" title="Karşılaştırmaya Ekle">
+                                            <i class="fas fa-balance-scale"></i>
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- İNCELE BUTONU -->
+                                    <a href="{% url 'teklif_al' paket.slug %}" class="btn-apple">
+                                        İncele
+                                    </a>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% else %}
+            <!-- APPLE STİLİ BOŞ SONUÇ (EMPTY STATE) -->
+            <div class="row justify-content-center mt-4">
+                <div class="col-lg-8">
+                    <div class="apple-empty-state">
+                        <div class="mb-4">
+                            <i class="fas fa-search" style="font-size: 4rem; color: var(--apple-border);"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-3" style="font-size: 2rem; letter-spacing: -1px;">Sonuç Bulunamadı</h4>
+                        <p class="text-muted mb-4 fs-6">Aradığınız kriterlere uygun bir yemek paketi veya catering firması bulamadık. Farklı kelimelerle veya konumlarla tekrar deneyebilirsiniz.</p>
+                        <a href="{% url 'home' %}" class="btn-apple" style="padding: 12px 30px; font-size: 15px;">
+                            Tüm Listeye Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================
+     SİHİRLİ AJAX FİLTRELEME SCRİPTİ (KORUNDU)
+     ========================================== -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById('ajax-filter-form');
+        const sonuclarDivi = document.getElementById('ajax-sonuclar');
+        const loadingIkonu = document.getElementById('loading-indicator');
+
+        // Form alanlarındaki değişiklikleri dinle
+        form.querySelectorAll('input, select').forEach(element => {
+            if(element.tagName === 'INPUT') {
+                element.addEventListener('input', debounce(filtrele, 500)); // Yazı yazarken 0.5sn bekle
+            } else {
+                element.addEventListener('change', filtrele); // Seçim yapıldığında anında çalıştır
+            }
+        });
+
+        // Veriyi çekip sadece sonuçları değiştiren asıl fonksiyon
+        async function filtrele() {
+            const formData = new FormData(form);
+            const searchParams = new URLSearchParams(formData);
+            const hedefUrl = `${form.action}?${searchParams.toString()}`;
+
+            // URL'i sessizce günceller
+            window.history.pushState({}, '', hedefUrl);
+
+            // Opaklığı düşür ve dönen ikonu göster
+            sonuclarDivi.style.opacity = '0.3';
+            loadingIkonu.style.display = 'block';
+
+            try {
+                const response = await fetch(hedefUrl);
+                const htmlMetni = await response.text();
+                
+                const parser = new DOMParser();
+                const yeniSayfa = parser.parseFromString(htmlMetni, 'text/html');
+                const yeniSonuclar = yeniSayfa.getElementById('ajax-sonuclar').innerHTML;
+                
+                sonuclarDivi.innerHTML = yeniSonuclar;
+                
+            } catch (hata) {
+                console.error('AJAX hatası:', hata);
+            } finally {
+                sonuclarDivi.style.opacity = '1';
+                loadingIkonu.style.display = 'none';
+            }
+        }
+
+        // Kullanıcı klavyede ard arda basarken sistemi yormamak için geciktirici
+        function debounce(func, wait) {
+            let timeout;
+            return function() {
+                const context = this, args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+    });
+</script>
+{% endblock %}

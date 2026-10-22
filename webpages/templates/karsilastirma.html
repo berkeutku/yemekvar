@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* APPLE GLOBAL DEĞİŞKENLER */
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-text-gray: #86868b;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-border: #d2d2d7;
+    }
+
+    body { background-color: #ffffff; }
+    h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.04em; }
+
+    /* HERO ALANI */
+    .compare-hero { text-align: center; padding: 60px 20px 40px; }
+    .compare-hero h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; letter-spacing: -0.04em; color: var(--apple-dark); margin-bottom: 10px; }
+    .compare-hero p { font-size: 1.2rem; color: var(--apple-text-gray); font-weight: 500; }
+
+    /* ANA KONTEYNER VE DİNAMİK GRID YAPISI */
+    .apple-compare-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 20px 80px;
+    }
+    .apple-grid {
+        display: grid;
+        /* VS Code hatasını çözen CSS Değişkeni yöntemi */
+        grid-template-columns: repeat(var(--col-count, 1), 1fr);
+        column-gap: 40px;
+    }
+
+    /* 1. YAPIŞKAN (STICKY) BAŞLIK - Aşağı kaydırıldığında üstte kalır */
+    .sticky-header {
+        position: sticky;
+        top: 60px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        z-index: 100;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--apple-border);
+        margin-bottom: 60px;
+    }
+
+    .product-col { text-align: center; display: flex; flex-direction: column; align-items: center; }
+    
+    .product-img-wrap {
+        width: 100%;
+        max-width: 250px;
+        height: 180px;
+        margin-bottom: 25px;
+        border-radius: 20px;
+        overflow: hidden;
+        background: var(--apple-light-bg);
+        display: flex; align-items: center; justify-content: center;
+    }
+    .product-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+    .product-brand { font-size: 0.75rem; font-weight: 700; color: var(--apple-text-gray); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .product-title { font-size: 1.5rem; font-weight: 800; color: var(--apple-dark); letter-spacing: -0.02em; margin-bottom: 8px; line-height: 1.2; }
+    .product-price { font-size: 1.1rem; font-weight: 500; color: var(--apple-dark); margin-bottom: 25px; }
+
+    .btn-apple-buy {
+        background: var(--apple-blue); color: white !important; border-radius: 50px; padding: 8px 24px; font-size: 0.95rem; font-weight: 600; text-decoration: none; transition: 0.2s; margin-bottom: 15px;
+    }
+    .btn-apple-buy:hover { background: #0077ed; transform: scale(1.02); }
+
+    .btn-remove {
+        color: var(--apple-blue); background: none; border: none; font-size: 0.85rem; text-decoration: none; padding: 0; cursor: pointer; transition: 0.2s;
+    }
+    .btn-remove:hover { text-decoration: underline; }
+
+    /* 2. ÖZELLİK BLOKLARI (Apple Tipi Segmentler) */
+    .spec-section { margin-bottom: 60px; }
+    .spec-section-title {
+        text-align: center; font-size: 1.6rem; font-weight: 800; color: var(--apple-dark); margin-bottom: 40px; padding-bottom: 15px; border-bottom: 1px solid var(--apple-border); letter-spacing: -0.02em;
+    }
+    .spec-row { margin-bottom: 40px; }
+    
+    .spec-icon { font-size: 1.8rem; color: var(--apple-dark); margin-bottom: 15px; display: block; text-align: center; }
+    .spec-label { display: block; text-align: center; font-size: 0.85rem; font-weight: 700; color: var(--apple-text-gray); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.03em; }
+    .spec-value { text-align: center; font-size: 1.1rem; font-weight: 600; color: var(--apple-dark); line-height: 1.4; }
+    .spec-value-desc { text-align: center; font-size: 0.95rem; font-weight: 500; color: var(--apple-text-gray); line-height: 1.5; margin-top: 10px;}
+
+    /* BOŞ DURUM */
+    .empty-state { text-align: center; padding: 100px 20px; }
+    .empty-state i { font-size: 5rem; color: var(--apple-light-bg); margin-bottom: 20px; }
+    .empty-state h2 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 15px; color: var(--apple-dark); }
+
+    @media (max-width: 768px) {
+        .apple-grid { column-gap: 15px; }
+        .product-title { font-size: 1.1rem; }
+        .product-img-wrap { height: 120px; margin-bottom: 15px; }
+        .spec-value { font-size: 0.95rem; }
+        .sticky-header { padding-top: 10px; }
+    }
+</style>
+
+<div class="compare-hero">
+    <h1>Hangi paket size uygun?</h1>
+    <p>Seçimlerinizi yan yana getirin, ihtiyacınıza en uygun olanı keşfedin.</p>
+</div>
+
+{% if paketler %}
+    <!-- HTML üzerinden CSS değişkenine dinamik sayıyı aktarıyoruz -->
+    <div class="apple-compare-container" style="--col-count: {{ paketler|length|default:1 }};">
+        
+        <!-- YAPIŞKAN (STICKY) BAŞLIK: Resimler ve Satın Al Butonları -->
+        <div class="sticky-header">
+            <div class="apple-grid">
+                {% for paket in paketler %}
+                <div class="product-col" id="col-{{ paket.slug }}">
+                    <div class="product-img-wrap">
+                        {% if paket.resim %}
+                            <img src="{{ paket.resim.url }}" alt="{{ paket.isim }}">
+                        {% else %}
+                            <i class="fas fa-image fa-3x opacity-25"></i>
+                        {% endif %}
+                    </div>
+                    <span class="product-brand">{{ paket.firma.isim }}</span>
+                    <h3 class="product-title">{{ paket.isim }}</h3>
+                    <p class="product-price">{{ paket.fiyat }} ₺</p>
+                    <a href="{% url 'teklif_al' paket.slug %}" class="btn-apple-buy">İncele</a>
+                    <button onclick="listedenCikar('{{ paket.slug }}')" class="btn-remove">Listeden Çıkar</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 1. BÖLÜM: GENEL ÖZELLİKLER -->
+        <div class="spec-section">
+            <h2 class="spec-section-title">Temel Özellikler</h2>
+            
+            <div class="apple-grid spec-row">
+                {% for paket in paketler %}
+                <div class="product-col">
+                    <span class="spec-label">Kategori</span>
+                    <span class="spec-value">{{ paket.hizmet.baslik|default:"Standart Catering" }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="apple-grid spec-row">
+                {% for paket in paketler %}
+                <div class="product-col">
+                    <span class="spec-label">Minimum Sipariş</span>
+                    <span class="spec-value">{{ paket.min_kisi_sayisi|default:"Bireysel / Limitsiz" }} Kişi</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 2. BÖLÜM: HİZMET VE TESLİMAT -->
+        <div class="spec-section">
+            <h2 class="spec-section-title">Hizmet Kapsamı</h2>
+            
+            <div class="apple-grid spec-row">
+                {% for paket in paketler %}
+                <div class="product-col">
+                    {% if paket.hedef_kitle == 'Bireysel' %}
+                        <i class="fas fa-motorcycle spec-icon"></i>
+                        <span class="spec-value">Adrese Teslimat</span>
+                        <div class="spec-value-desc">Günlük kapıya teslim paket servis hizmeti dahildir.</div>
+                    {% else %}
+                        <i class="fas fa-truck-loading spec-icon"></i>
+                        <span class="spec-value">Yerinde Kurulum</span>
+                        <div class="spec-value-desc">Profesyonel ekip ile etkinlik alanında dağıtım ve servis imkanı.</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 3. BÖLÜM: KALİTE VE İÇERİK -->
+        <div class="spec-section">
+            <h2 class="spec-section-title">İçerik & Güvence</h2>
+            
+            <div class="apple-grid spec-row">
+                {% for paket in paketler %}
+                <div class="product-col">
+                    <i class="fas fa-shield-check spec-icon"></i>
+                    <span class="spec-value">ISO 22000 & Tarım Bakanlığı</span>
+                    <div class="spec-value-desc">Tüm süreçler denetime tabi tutularak uluslararası standartlarda hazırlanır.</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="apple-grid spec-row mt-5">
+                {% for paket in paketler %}
+                <div class="product-col">
+                    <span class="spec-label">Paket İçeriği</span>
+                    <div class="spec-value-desc mt-0" style="text-align: left; padding: 0 10px;">{{ paket.aciklama }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <button onclick="tumunuTemizle()" class="btn-remove" style="font-size: 1rem;">Tümünü Temizle</button>
+        </div>
+
+    </div>
+{% else %}
+    <!-- BOŞ DURUM -->
+    <div class="empty-state">
+        <h2 class="fw-bold">Karşılaştıracak paket yok.</h2>
+        <p class="text-muted fs-5 mb-4">Sistemimizde ilgilendiğiniz paketleri karşılaştırmak için "Karşılaştır" butonunu kullanın.</p>
+        <a href="{% url 'home' %}" class="btn-apple-buy" style="padding: 12px 30px; font-size: 1.1rem;">Menülere Göz At</a>
+    </div>
+{% endif %}
+
+<!-- SİLME İŞLEMİ İÇİN JAVASCRIPT -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        if (!urlParams.has('ids') && !urlParams.has('clear')) {
+            let list = JSON.parse(localStorage.getItem('yemekvar_karsilastirma')) || [];
+            if (list.length > 0) {
+                window.location.href = window.location.pathname + "?ids=" + list.join(',');
+            }
+        }
+    });
+
+    function listedenCikar(id) {
+        let list = JSON.parse(localStorage.getItem('yemekvar_karsilastirma')) || [];
+        list = list.filter(item => String(item) !== String(id));
+        localStorage.setItem('yemekvar_karsilastirma', JSON.stringify(list));
+        
+        if (list.length === 0) {
+            window.location.href = window.location.pathname + "?clear=true";
+        } else {
+            window.location.href = window.location.pathname + "?ids=" + list.join(',');
+        }
+    }
+
+    function tumunuTemizle() {
+        localStorage.removeItem('yemekvar_karsilastirma');
+        window.location.href = window.location.pathname + "?clear=true";
+    }
+</script>
+{% endblock %}

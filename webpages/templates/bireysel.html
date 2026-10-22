@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-border: #d2d2d7;
+    }
+    body { background-color: var(--apple-light-bg); font-family: 'Manrope', sans-serif; }
+    
+    .bireysel-hero {
+        background: #ffffff;
+        border-radius: 36px;
+        padding: 60px 40px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+        margin-bottom: 40px;
+    }
+    .bireysel-hero h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; letter-spacing: -1px; color: var(--apple-dark); margin-bottom: 20px; }
+    .bireysel-hero p { font-size: 1.2rem; color: #86868b; max-width: 600px; margin: 0 auto; line-height: 1.5; }
+
+    .search-card { border-radius: 24px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.04); background: #fff; transition: 0.3s; overflow: hidden; }
+    .search-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+    .price-tag { font-size: 1.5rem; font-weight: 700; color: var(--apple-dark); letter-spacing: -1px; }
+    .btn-apple { background: var(--apple-blue); color: #fff !important; border-radius: 50px; padding: 8px 22px; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; transition: 0.3s; }
+    .btn-apple:hover { background: #0077ed; transform: scale(1.02); }
+</style>
+
+<div class="container py-5 mt-3">
+    
+    <div class="bireysel-hero">
+        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill fw-bold mb-3">
+            <i class="fas fa-leaf me-1"></i> SADECE SİZE ÖZEL
+        </span>
+        <h1>Kendinize Değer Verin.<br>Her Gün Kapınızda.</h1>
+        <p>Sağlıklı, taze ve profesyonel şeflerin elinden çıkan günlük yemek abonelikleri ile mutfak derdini geride bırakın.</p>
+    </div>
+
+    <div class="row g-4">
+        {% for paket in paketler %}
+            <div class="col-md-4">
+                <div class="card search-card h-100 p-2">
+                    {% if paket.resim %}
+                        <img src="{{ paket.resim.url }}" class="card-img-top rounded-4" style="height: 220px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light rounded-4 d-flex align-items-center justify-content-center" style="height: 220px;">
+                            <i class="fas fa-image fa-3x text-muted opacity-25"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-secondary fw-bold" style="font-size: 11px; text-transform: uppercase;">{{ paket.firma.isim }}</span>
+                        </div>
+                        
+                        <h5 class="fw-bold text-dark fs-4 mb-2">{{ paket.isim }}</h5>
+                        <p class="text-muted small mb-4 flex-grow-1" style="font-size: 15px; line-height: 1.5;">{{ paket.aciklama|truncatechars:80 }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                            <div>
+                                <span class="price-tag">{{ paket.fiyat }} ₺</span><br>
+                                <span class="small text-muted fw-bold">/ Günlük Başlangıç</span>
+                            </div>
+                            <a href="{% url 'teklif_al' paket.slug %}" class="btn-apple">Paketi İncele</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-box-open fa-4x text-muted opacity-25 mb-3"></i>
+                <h3 class="fw-bold text-dark">Henüz Bireysel Paket Bulunmuyor</h3>
+                <p class="text-muted">Yakında harika menülerle burada olacağız.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

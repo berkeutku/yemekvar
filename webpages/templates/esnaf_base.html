@@ -1,0 +1,226 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esnaf Paneli | YemekVar</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Apple Tipi Manrope) -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* APPLE PRO DASHBOARD TEMA */
+        :root {
+            --apple-dark: #1d1d1f;
+            --apple-light-bg: #f5f5f7;
+            --apple-border: #d2d2d7;
+            --apple-nav-bg: rgba(29, 29, 31, 0.85); /* Apple Dark Glass */
+        }
+        
+        body { 
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background-color: var(--apple-light-bg); 
+            color: var(--apple-dark);
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* APPLE STİLİ BUZLU CAM NAVBAR */
+        .apple-esnaf-nav { 
+            background: var(--apple-nav-bg); 
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+        
+        .apple-brand {
+            color: #f5f5f7;
+            font-weight: 700;
+            font-size: 1.25rem;
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.3s;
+        }
+        .apple-brand:hover { color: #ffffff; opacity: 0.9; }
+
+        .apple-nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            padding: 8px 16px !important;
+            transition: color 0.2s ease;
+        }
+        .apple-nav-link:hover { color: #ffffff !important; }
+
+        /* APPLE BUTON (Çıkış Yap) */
+        .btn-apple-logout {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 6px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-apple-logout:hover {
+            background: #ff3b30; /* Apple Destructive Red */
+            border-color: #ff3b30;
+            color: #ffffff;
+            transform: scale(1.02);
+        }
+
+        /* APPLE MİNİMAL FOOTER */
+        .apple-esnaf-footer {
+            background-color: transparent;
+            color: #86868b;
+            text-align: center;
+            padding: 24px 0;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: auto;
+        }
+
+        /* MERKEZİ BİLDİRİM İÇİN CSS */
+        .apple-center-alert {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(0,0,0,0.08) !important;
+            border-radius: 24px !important;
+            color: #1d1d1f !important;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2) !important;
+            padding: 24px !important;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MERKEZİ BİLDİRİMLER (CENTER TOAST) -->
+    {% if messages %}
+    <div class="position-fixed top-50 start-50 translate-middle" style="z-index: 9999; width: 90%; max-width: 450px;">
+        {% for message in messages %}
+            <div class="alert apple-center-alert alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                <div class="me-3">
+                    <i class="fas fa-check-circle text-success" style="font-size: 2rem;"></i>
+                </div>
+                <div class="fw-bold flex-grow-1" style="font-size: 1.05rem; line-height: 1.4;">
+                    {{ message }}
+                </div>
+                <button type="button" class="btn-close shadow-none ms-2" data-bs-dismiss="alert" aria-label="Kapat"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- APPLE STİLİ ESNAF NAVBAR -->
+    <nav class="navbar navbar-expand-lg apple-esnaf-nav">
+        <div class="container">
+            <!-- Marka / Logo -->
+            <a class="apple-brand" href="{% url 'firma_dashboard' %}">
+                <i class="fas fa-store" style="font-size: 1.1rem;"></i> YemekVar Esnaf
+            </a>
+            
+            <button class="navbar-toggler border-0 shadow-none px-0" type="button" data-bs-toggle="collapse" data-bs-target="#esnafNav">
+                <i class="fas fa-bars text-white fs-5"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="esnafNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link apple-nav-link" href="{% url 'firma_dashboard' %}">
+                            <i class="fas fa-box me-1"></i> Siparişler & Paketler
+                        </a>
+                    </li>
+
+                    <!-- YENİ: BİLDİRİM MERKEZİ (AÇILIR MENÜ) -->
+                    <li class="nav-item dropdown ms-lg-3 mt-3 mt-lg-0 position-relative">
+                        <a class="nav-link apple-nav-link" href="#" id="bildirimDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Bildirimler">
+                            <i class="fas fa-bell" style="font-size: 1.1rem;"></i>
+                            <!-- Kırmızı Nokta (Okunmamış varsa) -->
+                            <span class="position-absolute top-25 start-75 translate-middle p-1 bg-danger border border-light rounded-circle" style="width: 10px; height: 10px;"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" aria-labelledby="bildirimDropdown" style="width: 320px; border-radius: 20px; padding: 0; overflow: hidden; margin-top: 15px;">
+                            <li class="p-3 border-bottom bg-light d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-dark mb-0">Bildirimler</span>
+                            </li>
+                            <div style="max-height: 320px; overflow-y: auto;">
+                                {% for bildirim in user.bildirimler.all|slice:":5" %}
+                                <li>
+                                    <a class="dropdown-item py-3 border-bottom text-wrap {% if not bildirim.okundu_mu %}bg-primary bg-opacity-10{% endif %}" href="{{ bildirim.link|default:'#' }}">
+                                        <h6 class="mb-1 fw-bold text-dark" style="font-size: 0.9rem;">{{ bildirim.baslik }}</h6>
+                                        <p class="mb-1 text-muted small lh-sm">{{ bildirim.mesaj }}</p>
+                                        <small class="text-secondary" style="font-size: 0.75rem;">{{ bildirim.tarih|timesince }} önce</small>
+                                    </a>
+                                </li>
+                                {% empty %}
+                                <li class="p-4 text-center text-muted small fw-medium">Henüz yeni bildiriminiz yok.</li>
+                                {% endfor %}
+                            </div>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+                        <!-- İŞLEVSEL DJANGO FORMU (KORUNDU) -->
+                        <form method="post" action="{% url 'cikis_yap' %}" class="m-0">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-apple-logout">
+                                <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- DİNAMİK İÇERİK ALANI -->
+    <main class="container py-5 flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- MİNİMAL FOOTER -->
+    <footer class="apple-esnaf-footer">
+        &copy; 2026 YemekVar Esnaf Paneli. Tüm hakları saklıdır.
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- BİLDİRİMLERİ 5 SANİYE SONRA OTOMATİK KAPATMA -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.apple-center-alert');
+            alerts.forEach(function(alertElement) {
+                setTimeout(function() {
+                    const bsAlert = new bootstrap.Alert(alertElement);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>

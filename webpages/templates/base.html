@@ -1,0 +1,834 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YemekVar | Türkiye'nin Dijital Şefi</title>
+    <link rel="icon" type="image/png" href="{% static 'yeni_yatay_logo.png' %}">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- YENİ ELITE FONTU -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* GLOBAL TEMA */
+        :root {
+            --sapphire-blue: #0f4c81;        
+            --sapphire-hover: #0b3d6a;  
+            --elite-dark: #1d1d1f; 
+            --elite-bg: #ffffff; 
+            --elite-border: #d2d2d7;
+            --apple-gray: #86868b;
+            --apple-light: #f5f5f7;
+            --apple-blue: #0071e3;
+            --apple-blue-hover: #0077ed;
+        }
+
+        body { 
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background-color: var(--elite-bg); 
+            color: var(--elite-dark);
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* =========================================
+           APPLE KLON NAVBAR (Buzlu Safir Mavisi - 60px)
+           ========================================= */
+        .apple-global-nav {
+            background-color: rgba(15, 76, 129, 0.85);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .apple-nav-container {
+            width: 100%;
+            max-width: 1100px; 
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+        }
+
+        .apple-nav-text-links {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .apple-nav-item {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            text-decoration: none;
+            opacity: 0.85;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+        .apple-nav-item:hover {
+            opacity: 1;
+            transform: scale(1.02);
+        }
+
+        /* YENİ: NAVBARDAN TEKLİF RADARI BUTONU */
+        .btn-apple-nav {
+            background-color: var(--elite-dark); 
+            color: #ffffff !important;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-left: 10px;
+        }
+        .btn-apple-nav:hover {
+            background-color: #0071e3;
+            transform: scale(1.04);
+            box-shadow: 0 6px 15px rgba(0, 113, 227, 0.3);
+        }
+
+        /* Sağ İkonlar */
+        .apple-nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .apple-nav-icon {
+            color: #ffffff;
+            font-size: 16px;
+            opacity: 0.85;
+            text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .apple-nav-icon:hover { 
+            opacity: 1; 
+            transform: scale(1.1);
+        }
+
+        /* =========================================
+           APPLE ARAMA EKRANI
+           ========================================= */
+        .apple-search-overlay {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            background-color: var(--apple-light);
+            z-index: 1040;
+            padding: 40px 20px 60px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        .apple-search-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .apple-search-backdrop {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 60px);
+            background: rgba(0,0,0,0.4);
+            z-index: 1035;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+        .apple-search-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .search-overlay-content {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        /* Devasa Arama Inputu */
+        .apple-large-search-form {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .apple-large-search-icon {
+            color: var(--apple-gray);
+            margin-right: 15px;
+        }
+        .apple-large-input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--elite-dark);
+            background: transparent;
+            letter-spacing: -0.5px;
+            caret-color: var(--sapphire-blue);
+        }
+        .apple-large-input::placeholder {
+            color: var(--apple-gray);
+        }
+        .apple-search-close-btn {
+            background: none;
+            border: none;
+            color: var(--apple-gray);
+            cursor: pointer;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .apple-search-close-btn:hover { color: var(--elite-dark); }
+
+        /* Hızlı Bağlantılar Listesi */
+        .apple-quick-links-title {
+            font-size: 13px;
+            color: var(--apple-gray);
+            font-weight: 500;
+            margin-bottom: 18px;
+        }
+        .apple-quick-links-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .apple-quick-links-list li {
+            margin-bottom: 16px;
+        }
+        .apple-quick-links-list a {
+            text-decoration: none;
+            color: var(--elite-dark);
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s;
+            letter-spacing: -0.01em;
+        }
+        .apple-quick-links-list a:hover {
+            color: var(--sapphire-blue);
+        }
+        .apple-arrow {
+            color: var(--apple-gray);
+            margin-right: 14px;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 991px) {
+            .apple-nav-text-links { display: none; }
+        }
+
+        /* Mobil Açılır Menü */
+        .apple-mobile-menu {
+            background-color: var(--sapphire-blue);
+        }
+        .apple-mobile-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            display: block;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: opacity 0.2s;
+        }
+        .apple-mobile-link:hover { opacity: 0.8; }
+
+/* =========================================
+       YENİ NESİL PREMİUM FOOTER
+       ========================================= */
+    footer { background: var(--elite-dark); color: #86868b; padding: 70px 0 30px; margin-top: auto; border-top: none; }
+    .footer-brand { font-size: 1.6rem; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; margin-bottom: 15px; display: inline-block;}
+    .footer-heading { color: #ffffff; font-weight: 700; margin-bottom: 24px; font-size: 1.1rem; letter-spacing: -0.01em;}
+    .footer-link { color: #86868b; text-decoration: none; display: inline-block; margin-bottom: 12px; font-weight: 500; transition: all 0.2s ease; font-size: 0.95rem; }
+    .footer-link:hover { color: #ffffff; transform: translateX(4px); }
+    
+    .footer-socials { display: flex; gap: 15px; margin-top: 25px; }
+    .footer-socials a { 
+        color: #86868b; font-size: 1.2rem; width: 40px; height: 40px; 
+        display: flex; align-items: center; justify-content: center; 
+        border-radius: 50%; background: rgba(255,255,255,0.05); transition: 0.3s; 
+    }
+    .footer-socials a:hover { color: #ffffff; background: var(--apple-blue); transform: translateY(-3px); }
+    
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.85rem; color: #515154; flex-wrap: wrap; gap: 15px;}
+    .footer-bottom-links a { color: #86868b; text-decoration: none; margin-left: 20px; transition: 0.2s; font-weight: 500; }
+    .footer-bottom-links a:hover { color: #ffffff; }
+
+    .footer-newsletter-input {
+        border-radius: 50px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); 
+        background: rgba(255,255,255,0.03); padding: 4px; display: flex; transition: 0.3s;
+    }
+    .footer-newsletter-input:focus-within { border-color: var(--apple-blue); background: rgba(255,255,255,0.08); }
+    .footer-newsletter-input input { border: none !important; box-shadow: none !important; color: white !important; }
+    .footer-newsletter-input input::placeholder { color: #515154; }
+    .footer-newsletter-input button { border-radius: 50px !important; padding: 10px 24px; font-weight: 700; }
+        /* =========================================
+           APPLE FLOATING VIP CARD (KARE / DİKEY WIDGET TASARIMI)
+           ========================================= */
+        .apple-floating-card {
+            position: fixed;
+            bottom: 35px;
+            right: 35px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 24px 20px; /* Üstten ve alttan daha uzun */
+            border-radius: 28px; /* Daha yumuşak Apple köşeleri */
+            text-decoration: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.18), 0 8px 20px rgba(0,0,0,0.08);
+            z-index: 1060;
+            display: flex;
+            flex-direction: column; /* YENİ: İkonu üste, metni alta alır (Kare/Dikey form) */
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 14px;
+            min-width: 150px; /* Genişliği sabitleyerek kare hissini artırıyoruz */
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .apple-floating-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 25px 50px rgba(0, 113, 227, 0.25), 0 12px 24px rgba(0,0,0,0.1);
+            border-color: rgba(0, 113, 227, 0.3);
+        }
+        .apple-floating-card .icon-box {
+            background: linear-gradient(135deg, #0071e3, #30b0c7);
+            color: white;
+            font-size: 2rem; 
+            width: 64px; 
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            box-shadow: 0 6px 15px rgba(0, 113, 227, 0.35);
+        }
+        .apple-floating-card .text-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .apple-floating-card .title {
+            color: var(--elite-dark);
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+        .apple-floating-card .subtitle {
+            color: var(--apple-blue);
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        @media (max-width: 768px) {
+            .apple-floating-card { bottom: 20px; right: 20px; padding: 16px; border-radius: 22px; min-width: 120px; }
+            .apple-floating-card .icon-box { width: 50px; height: 50px; font-size: 1.5rem; border-radius: 16px; }
+            .apple-floating-card .title { font-size: 15px; }
+            .apple-floating-card .subtitle { font-size: 12px; }
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    
+    <!-- MERKEZİ BİLDİRİMLER (CENTER TOAST) -->
+    {% if messages %}
+    <div class="position-fixed top-50 start-50 translate-middle" style="z-index: 9999; width: 90%; max-width: 450px;">
+        {% for message in messages %}
+            <div class="alert apple-center-alert alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                <div class="me-3">
+                    <i class="fas fa-check-circle text-success" style="font-size: 2rem;"></i>
+                </div>
+                <div class="fw-bold flex-grow-1" style="font-size: 1.05rem; line-height: 1.4;">
+                    {{ message }}
+                </div>
+                <button type="button" class="btn-close shadow-none ms-2" data-bs-dismiss="alert" aria-label="Kapat"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- MERKEZİ BİLDİRİM İÇİN CSS -->
+    <style>
+        .apple-center-alert {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(0,0,0,0.08) !important;
+            border-radius: 24px !important;
+            color: #1d1d1f !important;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2) !important;
+            padding: 24px !important;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+
+    <!-- MAVİ BUZLU CAM NAVBAR -->
+    <header class="apple-global-nav">
+        <div class="apple-nav-container">
+            
+            <!-- Sol: Logo -->
+            <a href="{% url 'home' %}" style="display: flex; align-items: center; text-decoration: none;">
+                <img src="{% static 'yeni_yatay_logo.png' %}" alt="YemekVar Logo" style="height: 50px; max-width: 250px; object-fit: contain;">
+            </a>
+ 
+            <!-- Orta: Metin Linkleri -->
+            <div class="apple-nav-text-links">
+                <a class="apple-nav-item" href="{% url 'home' %}">Ana Sayfa</a>
+                <a class="apple-nav-item" href="{% url 'firmalar' %}">İş Ortaklarımız</a>
+                <a class="apple-nav-item" href="{% url 'hakkimizda' %}">Hakkımızda</a>
+                <a class="apple-nav-item" href="{% url 'iletisim' %}">İletişim</a>
+                <a class="apple-nav-item" href="{% url 'is_ortagimiz_olun' %}">Bizimle Çalışın</a>
+            </div>
+
+            <!-- Sağ: İkonlar -->
+            <div class="apple-nav-icons">
+                
+                <!-- Arama İkonu -->
+                <button type="button" class="apple-nav-icon" id="searchToggleBtn" title="Arama">
+                    <i class="fas fa-search"></i>
+                </button>
+                
+                <!-- Karşılaştırma butonu -->
+                <a class="apple-nav-icon" href="javascript:void(0);" onclick="karsilastirmayaGit()" title="Karşılaştır">
+                    <i class="fas fa-balance-scale"></i>
+                </a>
+
+                {% if user.is_authenticated %}
+                    <!-- YENİ: BİLDİRİM MERKEZİ (AÇILIR MENÜ) -->
+                    <div class="dropdown d-inline-block position-relative">
+                        <a class="apple-nav-icon" href="#" id="bildirimDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Bildirimler">
+                            <i class="fas fa-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style="width: 10px; height: 10px;"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" aria-labelledby="bildirimDropdown" style="width: 320px; border-radius: 20px; padding: 0; overflow: hidden; margin-top: 15px;">
+                            <li class="p-3 border-bottom bg-light d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-dark mb-0">Bildirimler</span>
+                            </li>
+                            <div style="max-height: 320px; overflow-y: auto;">
+                                {% for bildirim in user.bildirimler.all|slice:":5" %}
+                                <li>
+                                    <a class="dropdown-item py-3 border-bottom text-wrap {% if not bildirim.okundu_mu %}bg-primary bg-opacity-10{% endif %}" href="{{ bildirim.link|default:'#' }}">
+                                        <h6 class="mb-1 fw-bold text-dark" style="font-size: 0.9rem;">{{ bildirim.baslik }}</h6>
+                                        <p class="mb-1 text-muted small lh-sm">{{ bildirim.mesaj }}</p>
+                                        <small class="text-secondary" style="font-size: 0.75rem;">{{ bildirim.tarih|timesince }} önce</small>
+                                    </a>
+                                </li>
+                                {% empty %}
+                                <li class="p-4 text-center text-muted small fw-medium">Henüz yeni bildiriminiz yok.</li>
+                                {% endfor %}
+                            </div>
+                        </ul>
+                    </div>
+
+                    <!-- Profil İkonu -->
+                    <a class="apple-nav-icon" href="{% url 'profil' %}" title="Profilim">
+                        <i class="far fa-user"></i>
+                    </a>
+                {% else %}
+                    <!-- Misafir Giriş İkonu -->
+                    <a class="apple-nav-icon" href="#" data-bs-toggle="modal" data-bs-target="#authModal" title="Giriş Yap / Üye Ol">
+                        <i class="far fa-user"></i>
+                    </a>
+                {% endif %}
+
+                <!-- TEKLİF RADARI BUTONU (Masaüstü ve Tabletlerde Görünür) -->
+                <a href="{% url 'hizli_teklif' %}" class="btn-apple-nav d-none d-md-inline-flex" title="Teklif Radarı">
+                    <i class="fas fa-satellite-dish text-warning me-1"></i> Teklif Radarı
+                </a>
+
+                <!-- Mobil Hamburger Butonu -->
+                <a class="apple-nav-icon d-lg-none ms-1" href="#" data-bs-toggle="collapse" data-bs-target="#appleMobileMenu">
+                    <i class="fas fa-bars"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- APPLE ARAMA EKRANI (SVG İkonlarla Kırılmaz Tasarım) -->
+    <div class="apple-search-backdrop" id="searchBackdrop"></div>
+    <div class="apple-search-overlay" id="searchOverlay">
+        <div class="search-overlay-content">
+            <!-- Arama Formu -->
+            <form action="{% url 'arama' %}" method="GET" class="apple-large-search-form">
+                <!-- Şık Büyüteç SVG -->
+                <svg class="apple-large-search-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                
+                <input type="text" name="q" class="apple-large-input" placeholder="Arama" id="overlaySearchInput" autocomplete="off">
+                
+                <button type="button" class="apple-search-close-btn" id="searchCloseBtn">
+                    <!-- Şık Çarpı SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </form>
+
+            <!-- Hızlı Bağlantılar -->
+            <div class="apple-quick-links-title">Hızlı Bağlantılar</div>
+            <ul class="apple-quick-links-list">
+                <li>
+                    <a href="{% url 'firmalar' %}">
+                        <svg class="apple-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                        Tüm Catering Firmaları
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'hakkimizda' %}">
+                        <svg class="apple-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                        YemekVar Hakkında
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'iletisim' %}">
+                        <svg class="apple-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                        Özel Menü Talebi Oluşturun
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#authModal">
+                        <svg class="apple-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                        Ücretsiz Kayıt Olun
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'is_ortagimiz_olun' %}">
+                        <svg class="apple-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                        Tedarikçi Ağına Katılın
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Mobil Açılır Menü -->
+    <div class="collapse d-lg-none apple-mobile-menu" id="appleMobileMenu">
+        <div class="px-4 py-4">
+            <!-- Mobilde Teklif Radarı Butonu -->
+            <a class="apple-mobile-link text-warning fw-bold mb-2 border-bottom-0 pb-2" style="font-size: 1.1rem;" href="{% url 'hizli_teklif' %}">
+                <i class="fas fa-satellite-dish me-2"></i>Teklif Radarı
+            </a>
+            <div class="border-top border-secondary mb-2" style="opacity: 0.3;"></div>
+
+            <a class="apple-mobile-link" href="{% url 'home' %}">Ana Sayfa</a>
+            <a class="apple-mobile-link" href="{% url 'firmalar' %}">İş Ortaklarımız</a>
+            <a class="apple-mobile-link" href="{% url 'hakkimizda' %}">Hakkımızda</a>
+            <a class="apple-mobile-link" href="{% url 'iletisim' %}">İletişim</a>
+            <a class="apple-mobile-link border-0" href="{% url 'is_ortagimiz_olun' %}">Bizimle Çalışın</a>
+        </div>
+    </div>
+    
+    <!-- İÇERİK -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="row g-5">
+                
+                <div class="col-lg-4 col-md-6 pe-lg-5">
+                    <span class="footer-brand">YemekVar.</span>
+                    <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">Premium catering deneyimini, şeffaf, hızlı ve güvenilir bir ekosistemde kurumlarla ve bireylerle buluşturuyoruz.</p>
+                    <div class="footer-socials">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-heading">Platform</h5>
+                    <a href="{% url 'home' %}" class="footer-link">Ana Sayfa</a>
+                    <a href="{% url 'firmalar' %}" class="footer-link">Tüm Firmalar</a>
+                    <a href="{% url 'bireysel_abonelik' %}" class="footer-link">Bireysel Abonelik</a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'profil' %}" class="footer-link">Profilim</a>
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-heading">Kurumsal</h5>
+                    <a href="{% url 'hakkimizda' %}" class="footer-link">Hakkımızda</a>
+                    <a href="{% url 'iletisim' %}" class="footer-link">İletişim</a>
+                    <a href="{% url 'is_ortagimiz_olun' %}" class="footer-link text-white fw-bold">Aramıza Katıl</a>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="footer-heading">İletişimde Kalın</h5>
+                    <p style="font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px;">Fırsatlardan ve yeni nesil menülerden haberdar olmak için e-bültenimize katılın.</p>
+                    <div class="footer-newsletter-input">
+                        <input type="email" class="form-control bg-transparent px-3" placeholder="E-posta adresiniz">
+                        <button class="btn btn-light text-dark">Abone Ol</button>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="footer-bottom">
+                <div>&copy; 2026 YemekVar Inc. Tüm hakları saklıdır.</div>
+                <div class="footer-bottom-links">
+                    <a href="{% url 'sartlar_kosullar' %}">Şartlar ve Koşullar</a>
+                    <a href="#">Gizlilik Politikası</a>
+                    <a href="{% url 'kvkk_aydinlatma' %}">KVKK Aydınlatma</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- APPLE VIP FLOATING CARD -->
+    <a href="{% url 'bireysel_abonelik' %}" class="apple-floating-card">
+        <div class="icon-box">
+            <i class="fas fa-gift"></i>
+        </div>
+        <div class="text-box">
+            <span class="title">Bireysel Abonelik</span>
+            <span class="subtitle">Paketleri Keşfet <i class="fas fa-arrow-right"></i></span>
+        </div>
+    </a>
+
+    <!-- BİRLEŞİK GİRİŞ / KAYIT MODALI (YemekVar Apple Teması Uyumlu) -->
+    <style>
+        .auth-tabs .nav-link { color: #86868b; font-weight: 600; border-radius: 0; border-bottom: 2px solid transparent; padding-bottom: 12px; font-size: 1.1rem; }
+        /* Aktif sekmeyi temanın ana mavisini yapıyoruz */
+        .auth-tabs .nav-link.active { color: var(--sapphire-blue); background: transparent; border-bottom: 2px solid var(--sapphire-blue); }
+        
+        .custom-input-group { border: 1px solid var(--apple-border); border-radius: 12px; overflow: hidden; transition: all 0.3s; background: #ffffff; }
+        /* Focus efekti yeşil yerine mavi yapıldı */
+        .custom-input-group:focus-within { border-color: var(--sapphire-blue); box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.15); }
+        
+        .custom-input-group .input-group-text { border: none; background: transparent; color: #a1a1a6; width: 45px; justify-content: center; }
+        .custom-input-group .form-control { border: none; box-shadow: none; background: transparent; padding: 14px 10px 14px 0; font-weight: 500; }
+        .custom-input-group .form-control::placeholder { color: #a1a1a6; }
+        
+        .btn-auth-submit { border-radius: 50px; padding: 14px; font-weight: 700; font-size: 1.1rem; transition: 0.3s; border: none; color: white; }
+        
+        /* Giriş Butonu: Elite Dark */
+        .btn-login { background-color: var(--elite-dark); }
+        .btn-login:hover { background-color: #000000; transform: scale(1.02); }
+        
+        /* Üye Ol Butonu: Sapphire Blue */
+        .btn-register { background-color: var(--sapphire-blue); }
+        .btn-register:hover { background-color: var(--sapphire-hover); transform: scale(1.02); }
+    </style>
+
+    <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
+            <div class="modal-content border-0" style="border-radius: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.15); background-color: #fafafa;">
+                
+                <div class="modal-header border-0 pb-0 position-relative text-center d-block pt-4 px-4">
+                    <h4 class="fw-bold mb-0 text-dark" style="letter-spacing: -0.5px;">Hoş Geldiniz</h4>
+                    <button type="button" class="btn-close shadow-none position-absolute top-0 end-0 mt-4 me-4 bg-light rounded-circle p-2" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                
+                <div class="modal-body p-4 pt-3">
+                    <!-- SEKMELER -->
+                    <ul class="nav nav-pills nav-justified mb-4 auth-tabs" id="authTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#login" type="button" role="tab">Giriş Yap</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#register" type="button" role="tab">Üye Ol</button>
+                        </li>
+                    </ul>
+
+                    <!-- SEKME İÇERİKLERİ -->
+                    <div class="tab-content" id="authTabContent">
+                        
+                        <!-- GİRİŞ YAP FORMU -->
+                        <div class="tab-pane fade show active" id="login" role="tabpanel">
+                            <form action="{% url 'giris' %}" method="POST">
+                                {% csrf_token %}
+                                <div class="input-group mb-3 custom-input-group">
+                                    <span class="input-group-text"><i class="far fa-user"></i></span>
+                                    <input type="text" name="username" class="form-control" placeholder="Kullanıcı Adı" required>
+                                </div>
+                                <div class="input-group mb-4 custom-input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" name="password" class="form-control" placeholder="Şifre" required>
+                                </div>
+                                <button type="submit" class="btn-auth-submit btn-login w-100">Giriş Yap</button>
+                            </form>
+                        </div>
+
+                        <!-- ÜYE OL FORMU -->
+                        <div class="tab-pane fade" id="register" role="tabpanel">
+                            <form action="{% url 'kayit' %}" method="POST">
+                                {% csrf_token %}
+                                <div class="input-group mb-3 custom-input-group">
+                                    <span class="input-group-text"><i class="far fa-user"></i></span>
+                                    <input type="text" name="username" class="form-control" placeholder="Kullanıcı Adı" required>
+                                </div>
+                                <div class="input-group mb-3 custom-input-group">
+                                    <span class="input-group-text"><i class="far fa-envelope"></i></span>
+                                    <input type="email" name="email" class="form-control" placeholder="E-posta Adresi" required>
+                                </div>
+                                <div class="input-group mb-3 custom-input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" name="password" class="form-control" placeholder="Şifre" required>
+                                </div>
+                                <div class="input-group mb-3 custom-input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" name="password_confirm" class="form-control" placeholder="Şifre (Tekrar)" required>
+                                </div>
+                                
+                                <!-- Ad ve Soyad -->
+                                <div class="input-group mb-3 custom-input-group">
+                                    <span class="input-group-text"><i class="fas fa-pen"></i></span>
+                                    <input type="text" name="first_name" class="form-control" placeholder="Ad" required>
+                                </div>
+                                <div class="input-group mb-3 custom-input-group">
+                                    <span class="input-group-text"><i class="fas fa-pen"></i></span>
+                                    <input type="text" name="last_name" class="form-control" placeholder="Soyad" required>
+                                </div>
+
+                                <!-- GÖRÜNMEZ BOT TUZAĞI (HONEYPOT) -->
+                                <div style="display: none;">
+                                    <input type="text" name="website_url_field" tabindex="-1" autocomplete="off">
+                                </div>
+
+                                <div class="form-check mb-4 d-flex align-items-center">
+                                    <input class="form-check-input shadow-none me-2" type="checkbox" id="terms" required style="cursor: pointer;">
+                                    <label class="form-check-label text-muted" style="font-size: 0.85rem;" for="terms">
+                                        Şunları kabul ediyorum: <a href="{% url 'sartlar_kosullar' %}" target="_blank" class="text-decoration-none fw-bold" style="color: var(--sapphire-blue);">Şartlar</a> ve <a href="{% url 'kvkk_aydinlatma' %}" target="_blank" class="text-decoration-none fw-bold" style="color: var(--sapphire-blue);">KVKK</a>
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn-auth-submit btn-register w-100">Üye Ol</button>
+                            </form>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ARAMA OVERLAY JAVASCRIPT KONTROLÜ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchToggleBtn = document.getElementById('searchToggleBtn');
+            const searchCloseBtn = document.getElementById('searchCloseBtn');
+            const searchOverlay = document.getElementById('searchOverlay');
+            const searchBackdrop = document.getElementById('searchBackdrop');
+            const searchInput = document.getElementById('overlaySearchInput');
+
+            // Açma İşlemi
+            searchToggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                searchOverlay.classList.add('active');
+                searchBackdrop.classList.add('active');
+                setTimeout(() => { searchInput.focus(); }, 100);
+            });
+
+            // Kapatma Fonksiyonu
+            const closeSearch = () => {
+                searchOverlay.classList.remove('active');
+                searchBackdrop.classList.remove('active');
+                searchInput.value = '';
+            };
+
+            // Buton ve Maskeyle Kapatma
+            searchCloseBtn.addEventListener('click', closeSearch);
+            searchBackdrop.addEventListener('click', closeSearch);
+
+            // ESC Tuşu ile Kapatma
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
+                    closeSearch();
+                }
+            });
+        });
+    </script>
+    <script>
+   function karsilastirmayaGit() {
+        // Bozuk verileri (null/undefined) otomatik temizle
+        let rawList = JSON.parse(localStorage.getItem('yemekvar_karsilastirma')) || [];
+        let cleanList = rawList.filter(item => item && item !== "null" && item !== "undefined");
+        
+        // Temizlenmiş listeyi hafızaya geri yaz
+        localStorage.setItem('yemekvar_karsilastirma', JSON.stringify(cleanList));
+
+        if (cleanList.length > 0) {
+            window.location.href = "{% url 'karsilastirma' %}?ids=" + cleanList.join(',');
+        } else {
+            window.location.href = "{% url 'karsilastirma' %}";
+        }
+    }
+    </script>
+    <!-- BİLDİRİMLERİ 5 SANİYE SONRA OTOMATİK KAPATMA -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.apple-center-alert');
+            alerts.forEach(function(alertElement) {
+                setTimeout(function() {
+                    const bsAlert = new bootstrap.Alert(alertElement);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>

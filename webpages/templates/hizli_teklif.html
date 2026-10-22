@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* APPLE GLOBAL RENKLER & TİPOGRAFİ */
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-text-gray: #86868b;
+        --apple-border: #d2d2d7;
+    }
+
+    body { background-color: var(--apple-light-bg); }
+    h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.04em; }
+
+    /* ANA KART TASARIMI */
+    .apple-wizard-card {
+        background: #ffffff;
+        border-radius: 32px;
+        padding: 50px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+        border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    .wizard-section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--apple-dark);
+        margin-bottom: 20px;
+        letter-spacing: -0.5px;
+        border-bottom: 1px solid var(--apple-light-bg);
+        padding-bottom: 10px;
+    }
+
+    /* APPLE STİLİ SEÇİM HAPLARI */
+    .apple-pill-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .apple-pill-group input[type="radio"] {
+        display: none; 
+    }
+    .apple-pill-label {
+        background: var(--apple-light-bg);
+        border: 2px solid transparent;
+        color: var(--apple-dark);
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .apple-pill-label:hover {
+        background: #e8e8ed;
+    }
+    .apple-pill-group input[type="radio"]:checked + .apple-pill-label {
+        background: rgba(0, 113, 227, 0.1);
+        border-color: var(--apple-blue);
+        color: var(--apple-blue);
+    }
+
+    /* STANDART INPUTLAR */
+    .apple-input {
+        width: 100%;
+        background-color: var(--apple-light-bg);
+        border: 2px solid transparent;
+        border-radius: 16px;
+        padding: 16px 20px;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--apple-dark);
+        transition: all 0.3s;
+    }
+    .apple-input::placeholder { color: #a1a1a6; }
+    .apple-input:focus {
+        background-color: #ffffff;
+        border-color: var(--apple-blue);
+        box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+        outline: none;
+    }
+    .input-label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--apple-text-gray);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    /* APPLE STİLİ ÖZEL AÇILIR MENÜLER (CUSTOM SELECT) */
+    .apple-select-wrapper { position: relative; width: 100%; }
+    .apple-select-trigger {
+        width: 100%; background-color: var(--apple-light-bg); border: 2px solid transparent;
+        border-radius: 16px; padding: 16px 20px; font-size: 1rem; color: var(--apple-dark);
+        font-weight: 500; transition: all 0.3s ease; display: flex;
+        justify-content: space-between; align-items: center; cursor: pointer;
+    }
+    .apple-select-trigger span {
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; max-width: 85%; text-align: left;
+    }
+    .apple-select-trigger:hover { background-color: #e8e8ed; }
+    .apple-select-trigger.active { background-color: #ffffff; border-color: var(--apple-blue); box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); }
+    .apple-select-options {
+        position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+        background: rgba(255, 255, 255, 0.95); backdrop-filter: saturate(180%) blur(25px);
+        -webkit-backdrop-filter: saturate(180%) blur(25px);
+        border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        z-index: 100; max-height: 250px; overflow-y: auto; padding: 8px;
+    }
+    .apple-select-options.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .apple-select-option {
+        padding: 12px 16px; font-size: 0.95rem; font-weight: 600; color: var(--apple-dark);
+        border-radius: 10px; cursor: pointer; transition: 0.2s; margin-bottom: 2px;
+    }
+    .apple-select-option:hover { background-color: var(--apple-blue); color: #ffffff; }
+    .apple-select-option.selected { font-weight: 700; background-color: rgba(0, 113, 227, 0.1); color: var(--apple-blue); }
+    .apple-select-option.selected:hover { background-color: var(--apple-blue); color: #ffffff; }
+
+    /* GÖNDER BUTONU */
+    .btn-apple-submit {
+        background: var(--apple-dark);
+        color: #ffffff;
+        border: none;
+        border-radius: 50px;
+        padding: 18px 40px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        transition: 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+    }
+    .btn-apple-submit:hover {
+        background: #000000;
+        transform: scale(1.02);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .apple-wizard-card { padding: 30px 20px; }
+    }
+</style>
+
+<div class="container py-5 mt-3 mb-5">
+    
+   <!-- Başlık Alanı -->
+    <div class="text-center mb-5">
+        <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-pill px-3 py-2 mb-3 shadow-sm border">
+            <i class="fas fa-microchip text-primary me-2"></i>
+            <span class="fw-bold text-dark" style="font-size: 0.9rem;">YemekVar Akıllı Eşleştirme Sistemi</span>
+        </div>
+        <h1 class="fw-bold text-dark mb-3" style="font-size: clamp(2.2rem, 4vw, 3rem); letter-spacing: -1.5px;">Teklif Radarı</h1>
+        <p class="text-secondary fs-5 mx-auto" style="max-width: 650px; line-height: 1.6;">
+            Tek tek firma aramakla zaman kaybetmeyin. Etkinlik detaylarınızı tek bir formla sisteme iletin; algoritmamız kriterlerinize en uygun premium catering firmalarını anında tespit etsin ve size özel fiyat tekliflerini hazırlamalarını sağlasın.
+        </p>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            <div class="apple-wizard-card">
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    
+                    <!-- 1. BÖLÜM: ETKİNLİK TÜRÜ -->
+                    <div class="mb-5">
+                        <div class="wizard-section-title">1. Etkinlik Türü</div>
+                        <div class="apple-pill-group">
+                            <input type="radio" name="etkinlik_turu" id="tur1" value="Düğün & Nişan" checked>
+                            <label for="tur1" class="apple-pill-label"><i class="fas fa-rings"></i> Düğün & Nişan</label>
+
+                            <input type="radio" name="etkinlik_turu" id="tur2" value="Kurumsal Toplantı">
+                            <label for="tur2" class="apple-pill-label"><i class="fas fa-briefcase"></i> Kurumsal Toplantı</label>
+
+                            <input type="radio" name="etkinlik_turu" id="tur3" value="Kokteyl & Parti">
+                            <label for="tur3" class="apple-pill-label"><i class="fas fa-glass-cheers"></i> Kokteyl & Parti</label>
+                            
+                            <input type="radio" name="etkinlik_turu" id="tur4" value="Toplu Yemek">
+                            <label for="tur4" class="apple-pill-label"><i class="fas fa-utensils"></i> Toplu Yemek</label>
+                            
+                            <!-- Yeni Eklenenler -->
+                            <input type="radio" name="etkinlik_turu" id="tur5" value="Bireysel / Günlük Abonelik">
+                            <label for="tur5" class="apple-pill-label"><i class="fas fa-user"></i> Bireysel / Günlük</label>
+
+                            <input type="radio" name="etkinlik_turu" id="tur6" value="Diyet & Fit Menü">
+                            <label for="tur6" class="apple-pill-label"><i class="fas fa-leaf text-success"></i> Diyet & Fit Menü</label>
+                        </div>
+                    </div>
+
+                    <!-- 2. BÖLÜM: DETAYLAR (Yan Yana) -->
+                    <div class="mb-5">
+                        <div class="wizard-section-title">2. Etkinlik Detayları</div>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="input-label">Hedef Şehir / Bölge</label>
+                                <!-- apple-custom-select-source Sınıfı Eklendi -->
+                                <select name="sehir" class="apple-input apple-custom-select-source" required>
+                                    <option value="" disabled selected>Şehir Seçiniz...</option>
+                                    {% for sehir in sehirler_listesi %}
+                                        <option value="{{ sehir }}">{{ sehir }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="input-label">Tahmini Kişi Sayısı</label>
+                                <input type="number" name="kisi_sayisi" class="apple-input" placeholder="Örn: 150" min="1" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="input-label">Tarih / Başlangıç</label>
+                                <input type="date" name="tarih" class="apple-input" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="input-label">Öğün Tercihi</label>
+                                <!-- apple-custom-select-source Sınıfı Eklendi -->
+                                <select name="ogun" class="apple-input apple-custom-select-source" required>
+                                    <option value="Kahvaltı">Kahvaltı</option>
+                                    <option value="Öğle Yemeği" selected>Öğle Yemeği</option>
+                                    <option value="Akşam Yemeği">Akşam Yemeği</option>
+                                    <option value="Atıştırmalık/Kokteyl">Sadece Atıştırmalık</option>
+                                    <option value="Tüm Gün">Tüm Gün (Abonelik)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. BÖLÜM: İLETİŞİM VE NOTLAR -->
+                    <div class="mb-5">
+                        <div class="wizard-section-title">3. İletişim & Ekstra Talepler</div>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="input-label">Adınız Soyadınız</label>
+                                <input type="text" name="isim" class="apple-input" placeholder="Örn: Ahmet Yılmaz" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="input-label">Telefon Numaranız</label>
+                                <input type="tel" name="telefon" class="apple-input" placeholder="05XX XXX XX XX" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="input-label">Eklemek İstedikleriniz (Opsiyonel)</label>
+                                <textarea name="notlar" class="apple-input" rows="3" placeholder="Vegan menü seçeneği, özel konsept talebi, diyet listem vb..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GÖNDER BUTONU -->
+                    <button type="submit" class="btn-apple-submit">
+                        Radarı Başlat ve Teklif İste <i class="fas fa-radar"></i>
+                    </button>
+                    <p class="text-center text-muted mt-3 small">Talebiniz sistemimiz tarafından analiz edilip uygun firmalara iletilecektir.</p>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ÖZEL SELECT (DROPDOWN) DÖNÜŞTÜRÜCÜSÜ JAVASCRIPT -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('select.apple-custom-select-source').forEach(select => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'apple-select-wrapper';
+            select.parentNode.insertBefore(wrapper, select);
+            wrapper.appendChild(select);
+            select.classList.add('d-none'); // Orjinal select'i gizle
+
+            const trigger = document.createElement('div');
+            trigger.className = 'apple-select-trigger';
+            const seciliMetin = select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : 'Seçiniz';
+            trigger.innerHTML = `<span>${seciliMetin}</span> <i class="fas fa-chevron-down" style="font-size:0.8rem; color:#86868b;"></i>`;
+            wrapper.appendChild(trigger);
+
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'apple-select-options';
+            
+            Array.from(select.options).forEach((opt, index) => {
+                // Disabled seçenekleri (örneğin "Şehir Seçiniz...") listeye tıklanabilir olarak ekleme
+                if(opt.disabled) return;
+
+                const optDiv = document.createElement('div');
+                optDiv.className = 'apple-select-option' + (opt.selected ? ' selected' : '');
+                optDiv.textContent = opt.text;
+                
+                optDiv.addEventListener('click', () => {
+                    select.selectedIndex = index;
+                    select.value = opt.value;
+                    trigger.querySelector('span').textContent = opt.text;
+                    
+                    optionsContainer.querySelectorAll('.apple-select-option').forEach(el => el.classList.remove('selected'));
+                    optDiv.classList.add('selected');
+                    
+                    optionsContainer.classList.remove('open');
+                    trigger.classList.remove('active');
+                });
+                optionsContainer.appendChild(optDiv);
+            });
+            wrapper.appendChild(optionsContainer);
+
+            // Açma/Kapama Tetikleyicisi
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const acikMi = optionsContainer.classList.contains('open');
+                
+                // Diğer tüm açık menüleri kapat
+                document.querySelectorAll('.apple-select-options').forEach(el => el.classList.remove('open'));
+                document.querySelectorAll('.apple-select-trigger').forEach(el => el.classList.remove('active'));
+                
+                if (!acikMi) {
+                    optionsContainer.classList.add('open');
+                    trigger.classList.add('active');
+                }
+            });
+        });
+
+        // Ekranda boş bir yere tıklayınca menüyü kapat
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.apple-select-options').forEach(el => el.classList.remove('open'));
+            document.querySelectorAll('.apple-select-trigger').forEach(el => el.classList.remove('active'));
+        });
+    });
+</script>
+{% endblock %}

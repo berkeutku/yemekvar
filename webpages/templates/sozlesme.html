@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    body { background-color: #f5f5f7; }
+    .apple-legal-container {
+        max-width: 800px;
+        margin: 60px auto;
+        background: #ffffff;
+        border-radius: 32px;
+        padding: 60px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+    }
+    .apple-legal-header {
+        text-align: center;
+        border-bottom: 1px solid #d2d2d7;
+        padding-bottom: 30px;
+        margin-bottom: 40px;
+    }
+    .apple-legal-header h1 {
+        font-weight: 800;
+        font-size: 2.5rem;
+        letter-spacing: -1px;
+        color: #1d1d1f;
+        margin-bottom: 10px;
+    }
+    .apple-legal-header p { color: #86868b; font-weight: 500; }
+    .apple-legal-content {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: #515154;
+    }
+    .apple-legal-content h3 {
+        color: #1d1d1f;
+        font-weight: 700;
+        margin-top: 30px;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+    }
+    @media (max-width: 768px) {
+        .apple-legal-container { margin: 30px 15px; padding: 30px; }
+    }
+</style>
+
+<div class="container">
+    <div class="apple-legal-container">
+        <div class="apple-legal-header">
+            <i class="fas fa-shield-check text-success fa-3x mb-3"></i>
+            <h1>{{ baslik }}</h1>
+            <p>Son Güncelleme: 1 Eylül 2026</p>
+        </div>
+        
+        <div class="apple-legal-content">
+            {% if tip == 'sartlar' %}
+                <h3>1. Hizmetin Kapsamı</h3>
+                <p>YemekVar, premium catering firmaları ile kurumsal ve bireysel müşterileri bir araya getiren kapalı devre bir B2B eşleştirme platformudur. Platform üzerinden alınan fiyatlar referans niteliğindedir.</p>
+                
+                <h3>2. Kullanıcı Sorumlulukları</h3>
+                <p>Kullanıcılar, platforma kayıt olurken doğru ve güncel bilgi vermekle yükümlüdür. İşletme profilleri düzenli olarak denetlenmekte olup, platform kurallarına uymayan hesaplar kalıcı olarak silinir.</p>
+
+                <h3>3. Tadım Randevuları ve Siparişler</h3>
+                <p>Oluşturulan tadım randevuları ve sipariş talepleri bağlayıcı ön protokol niteliği taşır. Taraflar arasındaki nihai anlaşma, platform dışında yapılacak ticari sözleşme ile güvence altına alınır.</p>
+            {% elif tip == 'kvkk' %}
+                <h3>1. Veri Sorumlusunun Kimliği</h3>
+                <p>6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, YemekVar A.Ş. olarak kişisel verilerinizi veri sorumlusu sıfatıyla işliyoruz.</p>
+                
+                <h3>2. Kişisel Verilerin İşlenme Amacı</h3>
+                <p>Adınız, telefon numaranız, e-posta adresiniz ve etkinlik bilgileriniz; size en uygun catering tekliflerini sunabilmek, tadım randevularınızı organize etmek ve platform güvenliğini sağlamak amacıyla işlenmektedir.</p>
+
+                <h3>3. Veri Güvenliği ve Haklarınız</h3>
+                <p>Verileriniz, sektör standartlarında şifreleme ve siber güvenlik duvarları (XSS, CSRF korumaları) ile uçtan uca korunmaktadır. Verileriniz hiçbir koşulda üçüncü taraf reklam ajanslarına satılmaz.</p>
+            {% endif %}
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="javascript:history.back()" class="btn btn-dark rounded-pill px-4 py-2 fw-bold">Kabul Et ve Geri Dön</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

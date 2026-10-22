@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-text-gray: #86868b;
+        --apple-border: #d2d2d7;
+    }
+
+    body { background-color: var(--apple-light-bg); font-family: 'Manrope', -apple-system, sans-serif; }
+    h1, h2, h3, h4, h5 { letter-spacing: -0.04em; }
+
+    /* =========================================
+       ÜST KISIM: 7.PNG TASARIMI (BİREBİR & APPLE STİLİ)
+       ========================================= */
+    .hero-title { font-size: clamp(2.5rem, 4vw, 3.5rem); font-weight: 800; color: var(--apple-dark); line-height: 1.1; margin-bottom: 20px; }
+    .hero-title span { color: var(--apple-blue); }
+    .hero-subtitle { font-size: 1.15rem; color: var(--apple-text-gray); line-height: 1.6; margin-bottom: 40px; font-weight: 500; }
+    
+    .feature-item { 
+        background: #ffffff; 
+        border-radius: 24px; 
+        padding: 24px; 
+        display: flex; 
+        gap: 20px; 
+        margin-bottom: 20px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        border: 1px solid rgba(0,0,0,0.02);
+        transition: transform 0.3s ease;
+    }
+    .feature-item:hover { transform: translateX(10px); }
+    .feature-icon {
+        width: 55px; height: 55px; border-radius: 16px; background: rgba(0, 113, 227, 0.08);
+        color: var(--apple-blue); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;
+    }
+    
+    .application-form-card {
+        background: #ffffff;
+        border-radius: 36px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+    }
+    .apple-input-group label { font-size: 0.85rem; font-weight: 600; color: var(--apple-text-gray); margin-bottom: 8px; display: block; }
+    .apple-input-wrapper { position: relative; }
+    .apple-input-wrapper i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #a1a1a6; }
+    .apple-input {
+        width: 100%; background-color: var(--apple-light-bg); border: 2px solid transparent;
+        border-radius: 14px; padding: 14px 14px 14px 45px; font-size: 0.95rem; font-weight: 500; color: var(--apple-dark); transition: 0.3s;
+    }
+    textarea.apple-input { padding-left: 16px; }
+    .apple-input:focus { background-color: #ffffff; border-color: var(--apple-blue); outline: none; box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); }
+    
+    .btn-submit { background: var(--apple-blue); color: #fff; border: none; border-radius: 50px; padding: 16px; width: 100%; font-size: 1.1rem; font-weight: 700; transition: 0.3s; }
+    .btn-submit:hover { background: var(--apple-blue-hover); transform: scale(1.02); }
+
+    /* =========================================
+       ALT KISIM: YENİ NESİL FİYATLANDIRMA PAKETLERİ (9.PNG UYARLAMASI)
+       ========================================= */
+    .pricing-card {
+        background: #ffffff;
+        border-radius: 36px;
+        padding: 40px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        border: 1px solid rgba(0,0,0,0.03);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        position: relative;
+    }
+    .pricing-card:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(0,0,0,0.08); }
+    
+    /* Ortadaki Popüler Paket Vurgusu */
+    .pricing-card.popular {
+        border: 2px solid var(--apple-blue);
+        box-shadow: 0 20px 60px rgba(0, 113, 227, 0.12);
+        transform: scale(1.03);
+        z-index: 2;
+    }
+    .pricing-card.popular:hover { transform: scale(1.03) translateY(-10px); }
+    .popular-badge {
+        position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+        background: var(--apple-blue); color: #ffffff; padding: 6px 20px; border-radius: 50px;
+        font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px;
+    }
+
+    .plan-name { font-size: 1.5rem; font-weight: 800; color: var(--apple-dark); margin-bottom: 5px; }
+    .plan-desc { font-size: 0.95rem; color: var(--apple-text-gray); margin-bottom: 30px; line-height: 1.5; }
+    
+    .price-box { background: var(--apple-light-bg); border-radius: 20px; padding: 25px 20px; text-align: center; margin-bottom: 30px; }
+    .price-currency { font-size: 1.5rem; font-weight: 700; color: var(--apple-dark); vertical-align: top; margin-right: 2px; }
+    .price-amount { font-size: 3.5rem; font-weight: 800; color: var(--apple-dark); letter-spacing: -2px; line-height: 1; }
+    .price-period { font-size: 0.9rem; color: var(--apple-text-gray); font-weight: 600; display: block; margin-top: 5px; }
+
+    .feature-list { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+    .feature-list li { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; font-size: 0.95rem; color: #515154; font-weight: 500; }
+    .feature-list li i { color: #34c759; font-size: 1.2rem; margin-top: 2px; }
+    .feature-list li.disabled { color: #a1a1a6; text-decoration: line-through; }
+    .feature-list li.disabled i { color: #d2d2d7; }
+
+    .btn-plan { background: var(--apple-light-bg); color: var(--apple-dark); border-radius: 50px; padding: 14px; width: 100%; font-weight: 700; text-align: center; text-decoration: none; transition: 0.3s; display: block; margin-top: 30px; }
+    .btn-plan:hover { background: #e8e8ed; color: var(--apple-dark); }
+    .pricing-card.popular .btn-plan { background: var(--apple-blue); color: #fff; }
+    .pricing-card.popular .btn-plan:hover { background: var(--apple-blue-hover); }
+
+    @media (max-width: 991px) {
+        .pricing-card.popular { transform: none; border-width: 1px; }
+        .pricing-card.popular:hover { transform: translateY(-5px); }
+    }
+</style>
+
+<div class="container py-5 mt-3">
+    
+    <!-- =========================================
+         BÖLÜM 1: BAŞVURU FORMU VE AVANTAJLAR (7.PNG UYARLAMASI)
+         ========================================= -->
+    <div class="row g-5 align-items-center mb-5 pb-5">
+        <div class="col-lg-6 pr-lg-5">
+            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill fw-bold mb-4 d-inline-block" style="letter-spacing: 0.5px;">
+                <i class="fas fa-handshake me-1"></i> BİZİMLE ÇALIŞIN
+            </span>
+            <h1 class="hero-title">İş Ortağımız Olun,<br><span>Birlikte Büyüyelim.</span></h1>
+            <p class="hero-subtitle">YemekVar'ın premium ağına katılarak kurumsal müşteri portföyünüzü genişletin. Satışlarınızı artırırken operasyonunuzu dijitalleştirin.</p>
+
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                <div>
+                    <h5 class="fw-bold mb-2 text-dark">Yüksek Sipariş Hacmi</h5>
+                    <p class="text-muted small mb-0 lh-base">Kurumsal şirketlerin düzenli toplu siparişleriyle cironuzu garanti altına alın.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-laptop-code"></i></div>
+                <div>
+                    <h5 class="fw-bold mb-2 text-dark">Kolay Dijital Yönetim</h5>
+                    <p class="text-muted small mb-0 lh-base">Gelişmiş satıcı paneli ile siparişlerinizi, menülerinizi ve finansal süreçlerinizi tek ekrandan yönetin.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                <div>
+                    <h5 class="fw-bold mb-2 text-dark">%100 Ödeme Güvencesi</h5>
+                    <p class="text-muted small mb-0 lh-base">Sipariş teslimatının ardından ödemeleriniz eksiksiz ve zamanında hesabınıza aktarılır.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="application-form-card">
+                <h3 class="fw-bold text-dark mb-4 pb-2 border-bottom">Ön Başvuru Formu</h3>
+                <form method="POST" action="{% url 'is_ortagimiz_olun' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="apple-input-group">
+                                <label>Yetkili Adı Soyadı</label>
+                                <div class="apple-input-wrapper">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" name="ad_soyad" class="apple-input" placeholder="Adınız Soyadınız" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="apple-input-group">
+                                <label>Firma / Restoran Adı</label>
+                                <div class="apple-input-wrapper">
+                                    <i class="fas fa-store"></i>
+                                    <input type="text" name="firma_adi" class="apple-input" placeholder="İşletmenizin Adı" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="apple-input-group">
+                                <label>Telefon Numarası</label>
+                                <div class="apple-input-wrapper">
+                                    <i class="fas fa-phone-alt"></i>
+                                    <input type="tel" name="telefon" class="apple-input" placeholder="05XX XXX XX XX" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="apple-input-group">
+                                <label>E-posta Adresi</label>
+                                <div class="apple-input-wrapper">
+                                    <i class="fas fa-envelope"></i>
+                                    <input type="email" name="email" class="apple-input" placeholder="ornek@firma.com" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="apple-input-group">
+                                <label>Eklemek İstedikleriniz (İsteğe Bağlı)</label>
+                                <div class="apple-input-wrapper">
+                                    <textarea name="mesaj" class="apple-input" rows="3" placeholder="Hizmet kapasiteniz, günlük üretim hacminiz vb. detaylar..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn-submit">Başvuruyu Gönder <i class="fas fa-arrow-right ms-2"></i></button>
+                            <p class="text-center text-muted small mt-3 fw-medium"><i class="fas fa-lock me-1"></i> Bilgileriniz uçtan uca şifrelenir ve KVKK kapsamında korunur.</p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================
+         BÖLÜM 2: APPLE STİLİ B2B PAKETLERİ (9.PNG YERİNE ÖZGÜN TASARIM)
+         ========================================= -->
+    <div class="text-center mt-5 mb-5 pt-4">
+        <h2 class="fw-bold text-dark mb-3" style="font-size: 2.5rem; letter-spacing: -1px;">İşletmenize En Uygun Planı Seçin.</h2>
+        <p class="text-secondary fs-5 mx-auto" style="max-width: 600px;">Catering süreçlerinizi dijitalleştirmek ve satışlarınızı ölçeklendirmek için ihtiyacınız olan tüm araçlar.</p>
+    </div>
+
+    <div class="row g-4 justify-content-center align-items-center mb-5 pb-5">
+        
+        <!-- PAKET 1: BAŞLANGIÇ -->
+        <div class="col-lg-4 col-md-6">
+            <div class="pricing-card">
+                <h3 class="plan-name">Başlangıç</h3>
+                <p class="plan-desc">Platformu denemek ve temel düzeyde dijitalleşmek isteyen butik işletmeler için.</p>
+                
+                <div class="price-box">
+                    <span class="price-currency">₺</span><span class="price-amount">6.000</span>
+                    <span class="price-period">/ Yıllık Faturalandırılır</span>
+                </div>
+                
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> Standart İşletme Profili</li>
+                    <li><i class="fas fa-check-circle"></i> Sınırlı Fotoğraf Galerisi</li>
+                    <li><i class="fas fa-check-circle"></i> Aylık 10 Teklif Gönderme Hakkı</li>
+                    <li><i class="fas fa-check-circle"></i> Temel Müşteri Desteği</li>
+                    <li class="disabled"><i class="fas fa-times-circle"></i> Arama Sonuçlarında Üst Sıra</li>
+                    <li class="disabled"><i class="fas fa-times-circle"></i> Satış ve Rakip Analizleri</li>
+                </ul>
+                
+                <a href="#on-basvuru" class="btn-plan" onclick="document.querySelector('input[name=ad_soyad]').focus();">Hemen Başla</a>
+            </div>
+        </div>
+
+        <!-- PAKET 2: PROFESYONEL (POPÜLER/ORTA) -->
+        <div class="col-lg-4 col-md-6">
+            <div class="pricing-card popular">
+                <div class="popular-badge">EN ÇOK TERCİH EDİLEN</div>
+                <h3 class="plan-name">Büyüme <span style="color: var(--apple-blue);">Pro</span></h3>
+                <p class="plan-desc">Düzenli sipariş almak ve rekabette öne çıkmak isteyen kurumsal mutfaklar için.</p>
+                
+                <div class="price-box" style="background: rgba(0, 113, 227, 0.05);">
+                    <span class="price-currency">₺</span><span class="price-amount">15.000</span>
+                    <span class="price-period">/ Yıllık Faturalandırılır</span>
+                </div>
+                
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> Gelişmiş "Onaylı" İşletme Profili</li>
+                    <li><i class="fas fa-check-circle"></i> Sınırsız Yüksek Çözünürlüklü Galeri</li>
+                    <li><i class="fas fa-check-circle"></i> Sınırsız Teklif ve Pazarlık Modülü</li>
+                    <li><i class="fas fa-check-circle"></i> Arama Sonuçlarında Orta/Üst Sıra</li>
+                    <li><i class="fas fa-check-circle"></i> Dinamik Müşteri Yorumları Görünümü</li>
+                    <li><i class="fas fa-check-circle"></i> Öncelikli Canlı Destek</li>
+                </ul>
+                
+                <a href="#on-basvuru" class="btn-plan" onclick="document.querySelector('input[name=ad_soyad]').focus();">Profesyonel Olun</a>
+            </div>
+        </div>
+
+        <!-- PAKET 3: LİDER (PREMİUM) -->
+        <div class="col-lg-4 col-md-6">
+            <div class="pricing-card">
+                <h3 class="plan-name">Premium Lider</h3>
+                <p class="plan-desc">Bölgesindeki pazar payını domine etmek isteyen büyük çaplı catering firmaları için.</p>
+                
+                <div class="price-box">
+                    <span class="price-currency">₺</span><span class="price-amount">35.000</span>
+                    <span class="price-period">/ Yıllık Faturalandırılır</span>
+                </div>
+                
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> "Süper Esnaf" Altın Rozeti</li>
+                    <li><i class="fas fa-check-circle"></i> Ana Sayfada "Öne Çıkanlar" Vitrini</li>
+                    <li><i class="fas fa-check-circle"></i> Hızlı Teklif Radarına Limitsiz Erişim</li>
+                    <li><i class="fas fa-check-circle"></i> Şehir İçi Aramalarda İlk Sıra Garantisi</li>
+                    <li><i class="fas fa-check-circle"></i> Özel VIP Hesap Yöneticisi</li>
+                    <li><i class="fas fa-check-circle"></i> Gelişmiş Pazar ve Rakip Analiz Raporları</li>
+                </ul>
+                
+                <a href="#on-basvuru" class="btn-plan" onclick="document.querySelector('input[name=ad_soyad]').focus();">Zirveye Çıkın</a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

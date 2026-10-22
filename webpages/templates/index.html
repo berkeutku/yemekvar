@@ -1,0 +1,998 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* APPLE GLOBAL RENKLER & TİPOGRAFİ */
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-text-gray: #86868b;
+        --apple-border: #d2d2d7;
+    }
+
+    body { 
+        font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif; 
+        background-color: var(--apple-light-bg); 
+        color: var(--apple-dark); 
+        -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.04em; }
+
+    /* =========================================
+       HERO SİNEMATİK AFİŞ (EN TEPEDE)
+       ========================================= */
+    .hero-carousel { 
+        height: 75vh; 
+        min-height: 550px; 
+        background-color: #000; 
+        position: relative; 
+        overflow: hidden; 
+        margin-top: -60px; 
+    }
+    .carousel-fade .carousel-item { opacity: 0; transition-duration: 1s; }
+    .carousel-fade .carousel-item.active { opacity: 1; }
+    .hero-bg-img { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 10s ease; }
+    .carousel-item.active .hero-bg-img { transform: scale(1.05); }
+    .dark-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.55); z-index: 1; }
+    .apple-hero-content { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10; width: 100%; padding: 0 20px; }
+    .apple-hero-title { font-size: clamp(3rem, 6vw, 5.5rem); color: #fff; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 15px; }
+    .apple-hero-subtitle { font-size: clamp(1.2rem, 2vw, 1.6rem); color: rgba(255,255,255,0.9); font-weight: 500; margin-bottom: 35px; }
+    .carousel-indicators { z-index: 20; margin-bottom: 90px; gap: 8px; } 
+    .carousel-indicators [data-bs-target] { width: 45px; height: 4px; border-radius: 4px; background-color: rgba(255,255,255,0.3); border: none; }
+    .carousel-indicators .active { background-color: #fff; }
+
+    /* =========================================
+       APPLE STİLİ YÜZEN PLANLAYICI (GLASSMORPHISM)
+       ========================================= */
+    .apple-planner-wrapper {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: saturate(180%) blur(20px);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        padding: 30px 40px;
+        position: relative;
+        z-index: 50;
+        max-width: 1140px;
+        margin: 0 auto 40px;
+    }
+    
+    .mt-hero-overlap { margin-top: -80px !important; }
+    .mt-search-mode { margin-top: 40px !important; }
+
+    .apple-planner-title { font-size: 1.4rem; font-weight: 700; color: var(--apple-dark); letter-spacing: -1px; margin-bottom: 5px; line-height: 1.2; }
+    .apple-planner-subtitle { font-size: 0.75rem; color: var(--apple-text-gray); margin-bottom: 0; }
+    
+    .apple-label { font-size: 0.75rem; color: var(--apple-text-gray); font-weight: 600; margin-bottom: 6px; display: block; }
+    
+    /* Standart Inputlar (Örn: Tarih Seçici) */
+    .apple-input {
+        width: 100%;
+        background-color: rgba(0,0,0,0.04);
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        color: var(--apple-dark);
+        font-weight: 500;
+        transition: all 0.2s ease;
+        height: 42px;
+        appearance: none;
+    }
+    .apple-input:focus {
+        background-color: #ffffff;
+        border-color: var(--apple-blue);
+        box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        outline: none;
+    }
+
+    /* APPLE STİLİ ÖZEL AÇILIR MENÜLER (CUSTOM SELECT) */
+    .apple-select-wrapper { position: relative; width: 100%; }
+    .apple-select-trigger {
+        width: 100%; background-color: rgba(0,0,0,0.04); border: 1px solid transparent;
+        border-radius: 12px; padding: 10px 14px; font-size: 0.85rem; color: var(--apple-dark);
+        font-weight: 600; transition: all 0.2s ease; height: 42px; display: flex;
+        justify-content: space-between; align-items: center; cursor: pointer;
+    }
+    .apple-select-trigger span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        max-width: 85%;
+        text-align: left;
+    }
+    .apple-select-trigger:hover { background-color: rgba(0,0,0,0.06); }
+    .apple-select-trigger.active { background-color: #ffffff; border-color: var(--apple-blue); box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15); }
+    .apple-select-options {
+        position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+        background: rgba(255, 255, 255, 0.85); backdrop-filter: saturate(180%) blur(25px);
+        -webkit-backdrop-filter: saturate(180%) blur(25px);
+        border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        z-index: 100; max-height: 250px; overflow-y: auto; padding: 8px;
+    }
+    .apple-select-options.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .apple-select-option {
+        padding: 10px 14px; font-size: 0.85rem; font-weight: 600; color: var(--apple-dark);
+        border-radius: 10px; cursor: pointer; transition: 0.2s; margin-bottom: 2px;
+    }
+    .apple-select-option:last-child { margin-bottom: 0; }
+    .apple-select-option:hover { background-color: var(--apple-blue); color: #ffffff; }
+    .apple-select-option.selected { font-weight: 700; background-color: rgba(0, 113, 227, 0.1); color: var(--apple-blue); }
+    .apple-select-option.selected:hover { background-color: var(--apple-blue); color: #ffffff; }
+    
+    .apple-planner-btn {
+        background-color: var(--apple-dark);
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 0 20px;
+        height: 42px; 
+        font-weight: 600;
+        font-size: 0.95rem;
+        border: none;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .apple-planner-btn:hover { background-color: #333336; transform: scale(1.02); }
+
+    /* ORTAK BUTON YAPISI */
+    .btn-apple {
+        background: var(--apple-blue); color: #fff !important; border-radius: 50px; 
+        padding: 12px 28px; font-weight: 600; font-size: 15px; 
+        text-decoration: none; display: inline-block; transition: 0.3s; border: none;
+    }
+    .btn-apple:hover { background: var(--apple-blue-hover); transform: scale(1.02); }
+    .btn-apple-light { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); color: #fff !important; border: 1px solid rgba(255,255,255,0.3); }
+    .btn-apple-light:hover { background: #fff; color: var(--apple-dark) !important; border-color: #fff; }
+
+    /* ARAMA SONUÇLARI KARTLARI */
+    .search-card { border-radius: 24px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.04); background: #fff; transition: 0.3s; overflow: hidden; }
+    .search-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+    .price-tag { font-size: 1.5rem; font-weight: 700; color: var(--apple-dark); letter-spacing: -1px; }
+    .btn-compare { background: var(--apple-light-bg); color: var(--apple-dark); border-radius: 50px; padding: 8px 14px; text-decoration: none; font-size: 14px; transition: 0.2s; border: none; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-compare:hover { background: #e8e8ed; }
+
+    /* =========================================
+       APPLE BENTO GRID (KATEGORİLER)
+       ========================================= */
+    .bento-card { position: relative; overflow: hidden; display: block; border-radius: 24px; background: #000; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); margin-bottom: 20px; }
+    .bento-card:hover { transform: scale(1.02); }
+    .bento-large { height: 450px; } .bento-small { height: 450px; }
+    .bento-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: 0.5s; }
+    
+    .bento-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 100%); z-index: 1; transition: 0.3s; }
+    .bento-card:hover .bento-overlay { background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 100%); }
+    
+    .bento-content { position: absolute; bottom: 40px; left: 40px; right: 40px; z-index: 2; }
+    .bento-content h3 { font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; letter-spacing: -1px; color: #ffffff !important; text-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+    .bento-content p { font-size: 1.15rem; color: #ffffff !important; opacity: 0.95; margin-bottom: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.6); }
+    
+    .btn-bento { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); color: #fff !important; padding: 8px 20px; border-radius: 50px; font-weight: 600; text-decoration: none; font-size: 14px; transition: 0.3s; display: inline-block; border: 1px solid rgba(255,255,255,0.3); }
+    .bento-card:hover .btn-bento { background: #fff; color: #000 !important; border-color: #fff; }
+
+    /* SEKSİYON BEYAZ KARTLARI */
+    .apple-section-card { background: #fff; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); padding: 60px 40px; margin-bottom: 40px; }
+
+    /* =========================================
+       ÖNE ÇIKAN FİRMALAR KARTLARI (APP STORE STİLİ)
+       ========================================= */
+    .apple-featured-card {
+        background: #ffffff;
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        border: 1px solid rgba(0,0,0,0.02);
+        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .apple-featured-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    }
+    .apple-featured-img-wrapper {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+    }
+    .apple-featured-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+    .apple-featured-card:hover .apple-featured-img {
+        transform: scale(1.05);
+    }
+    .apple-featured-badge {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        color: var(--apple-dark);
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 8px 14px;
+        border-radius: 50px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+    }
+    .apple-featured-body {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+    .apple-featured-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--apple-dark);
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
+    }
+    .apple-featured-desc {
+        font-size: 0.95rem;
+        color: var(--apple-text-gray);
+        line-height: 1.5;
+        margin-bottom: 24px;
+        flex-grow: 1;
+    }
+    .btn-apple-outline-dark {
+        background: transparent;
+        color: var(--apple-dark);
+        border: 1px solid var(--apple-border);
+        border-radius: 50px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-align: center;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+    .btn-apple-outline-dark:hover {
+        background: var(--apple-dark);
+        color: #ffffff;
+        border-color: var(--apple-dark);
+    }
+
+    /* =========================================
+       REHBER/BLOG VE PROMO KARTLARI
+       ========================================= */
+    .apple-editorial-card {
+        position: relative; border-radius: 28px; overflow: hidden; height: 380px; text-decoration: none; display: block;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .apple-editorial-card:hover { transform: scale(1.02); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+    .apple-editorial-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: 0.8s ease; }
+    .apple-editorial-card:hover .apple-editorial-bg { transform: scale(1.05); }
+    .apple-editorial-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%); z-index: 1; }
+    .apple-editorial-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 30px; color: white; z-index: 2; }
+    .apple-editorial-tag {
+        position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
+        padding: 6px 14px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; color: white; border: 1px solid rgba(255,255,255,0.3); z-index: 2;
+    }
+    .apple-editorial-title { font-size: 1.4rem; font-weight: 800; line-height: 1.2; margin-bottom: 8px; letter-spacing: -0.5px; }
+    .apple-editorial-desc { 
+        font-size: 0.9rem; 
+        opacity: 0.85; 
+        margin-bottom: 0; 
+        display: -webkit-box; 
+        -webkit-line-clamp: 2; 
+        line-clamp: 2;
+        -webkit-box-orient: vertical; 
+        box-orient: vertical; 
+        overflow: hidden; 
+    }
+
+    /* Renkli Bilgi Kutuları (Bento Alt Yapısı) */
+    .promo-box { border-radius: 28px; padding: 40px 30px; height: 100%; display: flex; flex-direction: column; justify-content: center; transition: 0.3s; color: white; text-decoration: none;}
+    .promo-box:hover { transform: translateY(-5px); }
+    .promo-box h4 { font-weight: 800; letter-spacing: -0.5px; font-size: 1.6rem; margin-bottom: 10px; }
+    .promo-box p { font-size: 0.95rem; opacity: 0.9; margin: 0; }
+    .promo-dark { background: var(--apple-dark); }
+    .promo-blue { background: var(--apple-blue); }
+    .promo-green { background: #30d158; color: #000; }
+    .promo-green p { opacity: 0.8; color: #000;}
+
+    /* HARİTA TOOLTIP */
+    .city-tooltip { position: absolute; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); color: white; padding: 8px 16px; border-radius: 50px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: 0.2s; z-index: 10; }
+    .map-wrapper svg path { fill: var(--apple-light-bg); stroke: #fff; stroke-width: 1.5; transition: 0.2s; }
+    .active-city, .active-city path { fill: #d2d2d7 !important; cursor: pointer !important; }
+    .active-city:hover, .active-city:hover path { fill: var(--apple-blue) !important; }
+
+    /* =========================================
+       YENİ EKLENEN PAZARLAMA VE GÜVEN MODÜLLERİ
+       ========================================= */
+    .apple-stats-band { background-color: #ffffff; padding: 50px 0; border-radius: 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); margin-bottom: 40px; }
+    .stat-box { text-align: center; padding: 10px 20px; }
+    .stat-number { font-size: 3rem; font-weight: 800; color: var(--apple-dark); letter-spacing: -1.5px; margin-bottom: 5px; }
+    .stat-text { font-size: 0.9rem; color: var(--apple-text-gray); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .apple-how-it-works { margin-bottom: 40px; }
+    .apple-section-title { font-size: 2.2rem; font-weight: 800; color: var(--apple-dark); text-align: center; letter-spacing: -1px; margin-bottom: 40px; }
+    .apple-step-card { background: #ffffff; border-radius: 32px; padding: 40px 30px; text-align: center; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: transform 0.3s ease, box-shadow 0.3s ease; border: 1px solid rgba(0,0,0,0.02); }
+    .apple-step-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+    .step-icon-wrapper { width: 75px; height: 75px; background: rgba(0, 113, 227, 0.1); color: var(--apple-blue); border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 20px auto; }
+    .step-title { font-size: 1.3rem; font-weight: 800; color: var(--apple-dark); margin-bottom: 12px; letter-spacing: -0.5px; }
+    .step-desc { font-size: 0.95rem; color: var(--apple-text-gray); line-height: 1.5; font-weight: 500; }
+
+    .apple-dual-cta { margin-bottom: 40px; }
+    .cta-card { border-radius: 32px; padding: 50px 40px; height: 100%; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .cta-card:hover { transform: scale(1.02); }
+    .cta-b2b { background: var(--apple-dark); color: #ffffff; box-shadow: 0 20px 50px rgba(0,0,0,0.15); }
+    .cta-b2c { background: linear-gradient(135deg, #0071e3 0%, #30b0c7 100%); color: #ffffff; box-shadow: 0 20px 50px rgba(0, 113, 227, 0.25); }
+    .cta-icon { font-size: 2.5rem; margin-bottom: 20px; opacity: 0.9; }
+    .cta-title { font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 15px; line-height: 1.1; }
+    .cta-desc { font-size: 1.05rem; opacity: 0.85; line-height: 1.5; margin-bottom: 30px; font-weight: 500; }
+    .btn-cta-light { background: #ffffff; color: var(--apple-dark) !important; padding: 14px 28px; border-radius: 50px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; align-self: flex-start; }
+    .btn-cta-light:hover { background: #f5f5f7; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+    @media (max-width: 991px) { 
+        .apple-planner-wrapper { padding: 25px 20px; }
+        .apple-planner-btn { margin-top: 15px; } 
+        .bento-large, .bento-small { height: 350px; } 
+        .bento-content { bottom: 25px; left: 25px; right: 25px; } 
+        .bento-content h3 { font-size: 2rem; } 
+        .apple-section-card { padding: 40px 20px; } 
+    }
+</style>
+
+<!-- KATEGORİ SEÇİLİ DEĞİLSE SİNEMATİK AFİŞ (HERO) GÖSTER -->
+{% if not secili_kategori %}
+<div id="heroCarousel" class="carousel slide carousel-fade hero-carousel" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+    </div>
+
+    <div class="carousel-inner h-100">
+        <div class="carousel-item active h-100" data-bs-interval="6000">
+            <div class="hero-bg-img" style="background-image: url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+            <div class="dark-overlay"></div>
+            <div class="apple-hero-content">
+                <h1 class="apple-hero-title">Birlikte Büyüyelim!</h1>
+                <p class="apple-hero-subtitle">İşletmenize değer katan, yüksek standartlı catering çözümleri.</p>
+                <a href="{% url 'is_ortagimiz_olun' %}" class="btn-apple btn-apple-light">İş Ortağımız Olun</a>
+            </div>
+        </div>
+        
+        <div class="carousel-item h-100" data-bs-interval="6000">
+            <div class="hero-bg-img" style="background-image: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+            <div class="dark-overlay"></div>
+            <div class="apple-hero-content">
+                <h1 class="apple-hero-title">İlham Veren Lezzetler.</h1>
+                <p class="apple-hero-subtitle">Ekibinizin motivasyonunu ve enerjisini zirveye taşıyın.</p>
+                <a href="?kategori=Toplu Yemek" class="btn-apple btn-apple-light">Menüleri Keşfedin</a>
+            </div>
+        </div>
+        
+        <div class="carousel-item h-100" data-bs-interval="6000">
+            <div class="hero-bg-img" style="background-image: url('https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+            <div class="dark-overlay"></div>
+            <div class="apple-hero-content">
+                <h1 class="apple-hero-title">Kusursuz Detaylar.</h1>
+                <p class="apple-hero-subtitle">Prestijli davetleriniz için sınırları aşan profesyonellik.</p>
+                <a href="?kategori=Catering Hizmetleri" class="btn-apple btn-apple-light">Teklif Alın</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- ETKİNLİK PLANLAYICI -->
+<div class="container px-3 position-relative" style="z-index: 50;">
+    <div class="apple-planner-wrapper {% if not secili_kategori %}mt-hero-overlap{% else %}mt-search-mode{% endif %}">
+        <!-- FORM ACTION url 'home' OLARAK GÜNCELLENDİ (Arama sayfada filtrelensin diye) -->
+        <form action="{% url 'home' %}" method="GET" class="row g-3 align-items-end">
+            
+            <div class="col-lg-2 col-md-12 pb-1 border-end d-none d-lg-block">
+                <h2 class="apple-planner-title">Deneyimi<br>Planlayın</h2>
+                <p class="apple-planner-subtitle">En uygun çözümü bulun.</p>
+            </div>
+
+            <div class="col-lg-8 col-md-12">
+                <div class="row g-2">
+                    <div class="col-md-3 col-6">
+                        <label class="apple-label"><i class="fas fa-glass-cheers me-1"></i> Kategori</label>
+                        <select name="kategori" class="apple-input apple-custom-select-source">
+                            <option value="">Tümü</option>
+                            <option value="Toplu Yemek" {% if secili_kategori == 'Toplu Yemek' %}selected{% endif %}>Toplu Yemek</option>
+                            <option value="Diyet Yemek" {% if secili_kategori == 'Diyet Yemek' %}selected{% endif %}>Diyet & Fit Yemek</option>
+                            <option value="Catering Hizmetleri" {% if secili_kategori == 'Catering Hizmetleri' %}selected{% endif %}>Catering & Davet</option>
+                            <option value="Özel Organizasyon" {% if secili_kategori == 'Özel Organizasyon' %}selected{% endif %}>Özel Organizasyon</option>
+                            {% for kategori in kategoriler %}
+                                <option value="{{ kategori.isim|default:kategori }}" {% if secili_kategori == kategori.isim|default:kategori %}selected{% endif %}>{{ kategori.isim|default:kategori }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3 col-6">
+                        <label class="apple-label"><i class="fas fa-map-marker-alt me-1"></i> Konum</label>
+                        <select name="sehir" class="apple-input apple-custom-select-source">
+                            <option value="">Tümü</option>
+                            {% for sehir in sehirler_listesi %}
+                                <option value="{{ sehir }}" {% if secili_sehir == sehir %}selected{% endif %}>{{ sehir }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3 col-6">
+                        <label class="apple-label"><i class="far fa-calendar-alt me-1"></i> Tarih</label>
+                        <input type="date" name="tarih" class="apple-input" value="{{ secili_tarih|default:'' }}">
+                    </div>
+                    
+                    <div class="col-md-3 col-12">
+                        <label class="apple-label"><i class="fas fa-user-friends me-1"></i> Kapasite</label>
+                        <select name="kisi" class="apple-input apple-custom-select-source">
+                            <option value="">Fark Etmez</option>
+                            <option value="50" {% if secili_kisi == '50' %}selected{% endif %}>0 - 50 Kişi</option>
+                            <option value="150" {% if secili_kisi == '150' %}selected{% endif %}>50 - 150 Kişi</option>
+                            <option value="500" {% if secili_kisi == '500' %}selected{% endif %}>150 - 500 Kişi</option>
+                            <option value="501" {% if secili_kisi == '501' %}selected{% endif %}>500+ Kişi</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-12">
+                <button type="submit" class="apple-planner-btn w-100">
+                    İncele <i class="fas fa-chevron-right ms-2" style="font-size: 0.75rem;"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if secili_kategori %}
+<!-- ARAMA/FİLTRE SONUÇLARI -->
+<div class="container py-5">
+    <div class="row mb-5 justify-content-center text-center">
+        <div class="col-lg-8">
+            <h2 class="fw-bold mb-2" style="font-size: 3.5rem;">{{ secili_kategori }}</h2>
+            <p class="text-secondary fs-5">İhtiyacınıza en uygun profesyonel çözümler.</p>
+        </div>
+    </div>
+    <div class="row g-4">
+        {% for paket in paketler %}
+            <div class="col-md-4">
+                <div class="card search-card h-100 border-0 shadow-sm overflow-hidden" style="border-radius: 24px;">
+                    {% if paket.resim %}
+                        <div style="height: 240px; overflow: hidden;">
+                            <img src="{{ paket.resim.url }}" style="width: 100%; height: 100%; object-fit: cover; border-bottom-left-radius: 0; border-bottom-right-radius: 0;" alt="{{ paket.isim }}">
+                        </div>
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center bg-light text-muted" style="height: 240px;">
+                            <i class="fas fa-image fa-3x opacity-25"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-body p-4 d-flex flex-column bg-white">
+                        <div class="d-flex flex-column gap-2 mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                {% if paket.firma.logo %}
+                                    <img src="{{ paket.firma.logo.url }}" alt="{{ paket.firma.isim }}" style="width: 30px; height: 30px; object-fit: cover; border-radius: 8px;">
+                                {% endif %}
+                                <span class="text-secondary fw-bold" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">{{ paket.firma.isim }}</span>
+                            </div>
+                            
+                            <div class="d-flex flex-wrap gap-2 mt-1">
+                                <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 fw-bold" style="font-size: 0.75rem;">
+                                    <i class="fas fa-check-circle me-1"></i> %98 Teslimat
+                                </span>
+                                <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1 fw-bold" style="font-size: 0.75rem;">
+                                    <i class="fas fa-shield-alt me-1"></i> ISO 22000
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <h5 class="fw-bold text-dark fs-4 mb-2">{{ paket.isim }}</h5>
+                        <p class="text-muted small mb-4 flex-grow-1" style="font-size: 15px;">{{ paket.aciklama|truncatechars:90 }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                            <span class="price-tag">{{ paket.fiyat }} ₺</span>
+                            <div class="d-flex gap-2">
+                                <a href="javascript:void(0);" onclick="karsilastirmayaEkle('{{ paket.slug }}', '{{ paket.isim|escapejs }}')" class="btn-compare text-decoration-none" title="Karşılaştır">
+                                    <i class="fas fa-exchange-alt me-1"></i> Karşılaştır
+                                </a>
+                                <a href="{% url 'teklif_al' paket.slug %}" class="btn-apple" style="padding: 8px 20px; font-size: 14px;">İncele</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5"><h4 class="text-muted fw-bold">Sonuç Bulunamadı</h4></div>
+        {% endfor %}
+     </div>
+</div>
+{% else %}
+
+<!-- APPLE BENTO GRID (KATEGORİLER) -->
+<div class="container py-4">
+    <div class="row g-4">
+        <div class="col-lg-12">
+            <a href="?kategori=Toplu Yemek" class="bento-card bento-large">
+                <div class="bento-bg" style="background-image: url('https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=1600&q=80');"></div>
+                <div class="bento-overlay"></div>
+                <div class="bento-content">
+                    <h3>Toplu Yemek.</h3>
+                    <p>Kurumunuz, özel davetleriniz için her gün taze, dengeli ve profesyonel sıcak yemek deneyimi.</p>
+                    <span class="btn-bento">Menüleri İnceleyin</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a href="?kategori=Diyet Yemek" class="bento-card bento-small">
+                <div class="bento-bg" style="background-image: url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=800&q=80');"></div>
+                <div class="bento-overlay"></div>
+                <div class="bento-content">
+                    <h3>Zinde & Fit.</h3>
+                    <p>Kalori dengesi gözetilerek özenle hazırlanmış premium diyet seçenekleri.</p>
+                    <span class="btn-bento">Keşfedin</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a href="?kategori=Catering Hizmetleri" class="bento-card bento-small">
+                <div class="bento-bg" style="background-image: url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80');"></div>
+                <div class="bento-overlay"></div>
+                <div class="bento-content">
+                    <h3>Prestijli Davetler.</h3>
+                    <p>Özel anlarınızı unutulmaz kılacak yüksek standartlı gastronomi sanatı.</p>
+                    <span class="btn-bento">Keşfedin</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- YENİ MODÜL 1: SOSYAL KANIT VE GÜVEN BANDI -->
+<div class="container">
+    <div class="apple-stats-band" id="stats-section">
+        <div class="row g-4 text-center">
+            <div class="col-6 col-md-3">
+                <div class="stat-box">
+                    <div class="stat-number"><span class="counter" data-target="1000">0</span>+</div>
+                    <div class="stat-text">Zamanında Teslimat</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-box">
+                    <div class="stat-number"><span class="counter" data-target="1000">0</span>+</div>
+                    <div class="stat-text">Mutlu Müşteri</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-box">
+                    <div class="stat-number"><span class="counter" data-target="24">0</span></div>
+                    <div class="stat-text">Şehirde Hizmet</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-box">
+                    <div class="stat-number"><span class="counter-float" data-target="4.9">0.0</span>/5</div>
+                    <div class="stat-text">Müşteri Puanı</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- YENİ MODÜL 2: NASIL ÇALIŞIR? -->
+<div class="container apple-how-it-works">
+    <h2 class="apple-section-title">Sistem Nasıl Çalışır?</h2>
+    <div class="row g-4">
+        <!-- Adım 1 -->
+        <div class="col-md-4">
+            <div class="apple-step-card">
+                <div class="step-icon-wrapper"><i class="fas fa-search"></i></div>
+                <h3 class="step-title">1. İhtiyacınızı Belirleyin</h3>
+                <p class="step-desc">Kurumsal etkinliğiniz için bütçe planlayın veya kişisel beslenme hedefinize (diyet, ofis) uygun paketi seçin.</p>
+            </div>
+        </div>
+        <!-- Adım 2 -->
+        <div class="col-md-4">
+            <div class="apple-step-card">
+                <div class="step-icon-wrapper"><i class="fas fa-balance-scale"></i></div>
+                <h3 class="step-title">2. Şeffaf Karşılaştırın</h3>
+                <p class="step-desc">Bölgenizdeki en iyi catering firmalarının tekliflerini, içeriklerini ve hijyen puanlarını tek ekranda inceleyin.</p>
+            </div>
+        </div>
+        <!-- Adım 3 -->
+        <div class="col-md-4">
+            <div class="apple-step-card">
+                <div class="step-icon-wrapper"><i class="fas fa-truck-fast"></i></div>
+                <h3 class="step-title">3. Güvenle Teslim Alın</h3>
+                <p class="step-desc">Geri kalan tüm operasyonu bize bırakın. Yemeğiniz tam saatinde, sıcak ve kusursuz bir sunumla kapınıza gelsin.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HİZMET AĞIMIZ / HARİTA -->
+<div class="container py-5 border-bottom" style="border-color: rgba(0,0,0,0.04) !important;">
+    <div class="apple-section-card text-center mb-0">
+        <h2 class="mb-3" style="letter-spacing: -1px; font-size: 2.2rem;">Sınırları Aşan Lezzet Ağı.</h2>
+        <p class="text-muted mb-5">Şehrinize tıklayın; size en yakın, kalitesi onaylanmış seçkin iş ortaklarımızı anında keşfedin.</p>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-9 position-relative">
+                <div id="turkey-map-container" class="map-wrapper">
+                    {% include 'harita.html' %}
+                </div>
+                <div id="city-tooltip" class="city-tooltip"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ÖZELLİKLER BÖLÜMÜ -->
+<div class="container py-5 border-bottom" style="border-color: rgba(0,0,0,0.04) !important;">
+    <div class="apple-section-card text-center mb-0">
+        <h2 class="mb-5" style="letter-spacing: -1px; font-size: 2.2rem;">Sıradanlık geride kaldı.<br>Kusursuzluk artık standart.</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <i class="fas fa-shield-check mb-3 fs-1 text-dark"></i>
+                <h4 class="fw-bold mb-2">Sertifikalı Mükemmellik.</h4>
+                <p class="text-muted">Tüm iş ortaklarımız zorlu hijyen standartları ve lezzet denetimlerinden geçerek platforma dahil edilir.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="fas fa-balance-scale-right mb-3 fs-1 text-dark"></i>
+                <h4 class="fw-bold mb-2">Şeffaf Karşılaştırma.</h4>
+                <p class="text-muted">İhtiyacınıza en uygun teklifleri, gerçek müşteri yorumlarını ve bütçeleri saniyeler içinde kıyaslayın.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="fas fa-user-tie mb-3 fs-1 text-dark"></i>
+                <h4 class="fw-bold mb-2">Kusursuz Destek.</h4>
+                <p class="text-muted">Sipariş anından etkinliğinizin sonuna kadar profesyonel ekibimiz her adımda yanınızdadır.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- YENİ MODÜL 3: İKİLİ HAREKETE GEÇİRİCİ (B2B & B2C VİTRİNİ) -->
+<div class="container apple-dual-cta">
+    <div class="row g-4">
+        <!-- Kurumsal (B2B) Kartı -->
+        <div class="col-lg-6">
+            <div class="cta-card cta-b2b">
+                <div class="cta-icon"><i class="fas fa-building"></i></div>
+                <h2 class="cta-title">Kurumsal Çözümler</h2>
+                <p class="cta-desc">İş yemekleri, toplantılar, düğün ve büyük organizasyonlar. Kalabalık gruplar için kurumsal firmalardan anında fiyat teklifi alın, tadım randevusu oluşturun.</p>
+                <a href="{% url 'hizli_teklif' %}" class="btn-cta-light">
+                    Kurumsal Teklif Al <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Bireysel (B2C) Kartı -->
+        <div class="col-lg-6">
+            <div class="cta-card cta-b2c">
+                <div class="cta-icon"><i class="fas fa-leaf"></i></div>
+                <h2 class="cta-title">Bireysel Abonelikler</h2>
+                <p class="cta-desc">"Bugün ne yiyeceğim?" derdine son. Diyet, sporcu veya günlük ofis menünüzü seçin; sağlıklı ve sıcak yemekler her gün adresinize gelsin.</p>
+                <a href="{% url 'bireysel_abonelik' %}" class="btn-cta-light">
+                    Paketleri İncele <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PLATFORM İSTATİKLERİ VE BİLGİ BENTO GRID -->
+<div class="container py-5 border-bottom" style="border-color: rgba(0,0,0,0.04) !important;">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="promo-box promo-dark">
+                <i class="fas fa-globe-europe fa-2x mb-4 text-light opacity-75"></i>
+                <h4>Türkiye'nin En Büyük Lezzet Ekosistemi.</h4>
+                <p>Alanında uzman yüzlerce kurumsal tedarikçi tek bir platformda sizin için bir araya geldi.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'is_ortagimiz_olun' %}" class="promo-box promo-blue">
+                <i class="fas fa-chart-line fa-2x mb-4 text-light opacity-75"></i>
+                <h4>İşletmenizi Zirveye Taşıyın.</h4>
+                <p>Prestijli tedarikçi ağımıza katılın, yeni kurumsal müşterilerle eşleşip büyümenizi hızlandırın.</p>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <div class="promo-box promo-green">
+                <i class="fas fa-check-double fa-2x mb-4 opacity-75"></i>
+                <h4>Güvenin Teminat.</h4>
+                <p>Platformdaki her adım, YemekVar güvencesiyle korunur. Sürprizlere yer yok, sadece kalite var.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BU AYIN ÖNE ÇIKANLARI -->
+<div class="container py-5 border-bottom" style="border-color: rgba(0,0,0,0.04) !important;">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark mb-2" style="font-size: 2.5rem; letter-spacing: -1px;">{% now "F" %} Ayının Zirvedekileri.</h2>
+        <p class="text-secondary" style="font-size: 1.1rem;">Mükemmelliği kanıtlanmış, misafirlerinizin favorisi olan lider iş ortaklarımız.</p>
+    </div>
+    
+    <div class="row g-4">
+        {% for firma in one_cikan_firmalar|slice:":3" %}
+            <div class="col-md-4">
+                <div class="apple-featured-card">
+                    <div class="apple-featured-img-wrapper">
+                        <span class="apple-featured-badge"><i class="fas fa-shield-check text-success me-1"></i> Onaylı B2B Tedarikçisi</span>
+                        
+                        {% if firma.logo %}
+                            <img src="{{ firma.logo.url }}" class="apple-featured-img" alt="{{ firma.isim }}">
+                        {% elif firma.resim %}
+                            <img src="{{ firma.resim.url }}" class="apple-featured-img" alt="{{ firma.isim }}">
+                        {% else %}
+                            <div class="d-flex align-items-center justify-content-center h-100 bg-light text-muted">
+                                <i class="fas fa-image fa-3x opacity-25"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="apple-featured-body">
+                        <h4 class="apple-featured-title">{{ firma.isim }}</h4>
+                        <p class="apple-featured-desc">{{ firma.aciklama|truncatechars:85 }}</p>
+                        <a href="{% url 'firma_detay' firma.slug %}" class="btn-apple-outline-dark">Detayları İncele</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center text-muted py-4">
+                Henüz öne çıkan bir firma seçmediniz.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- REHBER VE İLHAM (BLOG) BÖLÜMÜ -->
+<div class="container py-5 border-bottom" style="border-color: rgba(0,0,0,0.04) !important;">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark mb-2" style="font-size: 2.5rem; letter-spacing: -1px;">Vizyoner İçerikler.</h2>
+        <p class="text-secondary" style="font-size: 1.1rem;">Doğru seçimi yapmanızı sağlayacak, sektöre yön veren uzman makaleleri.</p>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-4">
+            <a href="#" class="apple-editorial-card">
+                <span class="apple-editorial-tag">Rehber</span>
+                <div class="apple-editorial-bg" style="background-image: url('https://images.unsplash.com/photo-1555244162-803834f70033?w=800');"></div>
+                <div class="apple-editorial-overlay"></div>
+                <div class="apple-editorial-content">
+                    <div class="text-light opacity-75 small mb-2"><i class="far fa-calendar-alt"></i> 12 Ağustos 2026</div>
+                    <h3 class="apple-editorial-title">Kurumsal Teklifleri Okumanın Altın Kuralları.</h3>
+                    <p class="apple-editorial-desc">Mükemmel deneyim için fiyatın ötesine geçin. Seçim yaparken gözden kaçırmamanız gereken kritik detaylar.</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="#" class="apple-editorial-card">
+                <span class="apple-editorial-tag">İlham</span>
+                <div class="apple-editorial-bg" style="background-image: url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800');"></div>
+                <div class="apple-editorial-overlay"></div>
+                <div class="apple-editorial-content">
+                    <div class="text-light opacity-75 small mb-2"><i class="far fa-calendar-alt"></i> 05 Ağustos 2026</div>
+                    <h3 class="apple-editorial-title">Şirket Etkinliklerinde Kusursuzluk Sanatı.</h3>
+                    <p class="apple-editorial-desc">Ekibinizin motivasyonunu artıracak, uzun süre unutulmayacak prestijli bir akşam yemeği organize etmenin sırları.</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="#" class="apple-editorial-card">
+                <span class="apple-editorial-tag">Trendler</span>
+                <div class="apple-editorial-bg" style="background-image: url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800');"></div>
+                <div class="apple-editorial-overlay"></div>
+                <div class="apple-editorial-content">
+                    <div class="text-light opacity-75 small mb-2"><i class="far fa-calendar-alt"></i> 28 Temmuz 2026</div>
+                    <h3 class="apple-editorial-title">Gastronomi Dünyasının 2026 Favorileri.</h3>
+                    <p class="apple-editorial-desc">Gurme vegan seçeneklerden, fonksiyonel fit menülere kadar yeni nesil kurumsal beslenme trendleri.</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <div class="text-center mt-5">
+        <a href="#" class="btn-apple-outline-dark px-4 py-2" style="border-radius: 50px;">Tüm Arşivi Keşfedin</a>
+    </div>
+</div>
+
+{% endif %}
+
+<!-- HARİTA & BİLDİRİM & ÖZEL SELECT JS İŞLEMLERİ -->
+{{ sehirler_listesi|json_script:"sehir-verisi" }}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // 1. HARİTA KONTROLÜ
+        const tooltip = document.getElementById('city-tooltip');
+        const sehirler = document.querySelectorAll('#turkey-map-container svg g[id], #turkey-map-container svg path[id]');
+        
+        function sehirIsmiTemizle(isim) { return isim.toLowerCase().replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/i̇/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').trim(); }
+        
+        const rawCities = JSON.parse(document.getElementById('sehir-verisi').textContent);
+        const aktifSehirler = [...new Set(rawCities.map(city => sehirIsmiTemizle(city)))];
+        
+        sehirler.forEach(sehir => {
+            const sehirId = sehirIsmiTemizle(sehir.getAttribute('id'));
+            
+            if (aktifSehirler.includes(sehirId)) {
+                sehir.classList.add('active-city');
+                sehir.addEventListener('click', function() { window.location.href = "{% url 'firmalar' %}?sehir=" + sehirId; });
+                
+                sehir.addEventListener('mousemove', function(e) {
+                    const rect = document.getElementById('turkey-map-container').getBoundingClientRect();
+                    tooltip.style.opacity = '1'; 
+                    tooltip.style.left = (e.clientX - rect.left + 15) + 'px'; 
+                    tooltip.style.top = (e.clientY - rect.top + 15) + 'px';
+                    tooltip.innerHTML = sehirId.charAt(0).toUpperCase() + sehirId.slice(1) + " Firmaları";
+                });
+                
+                sehir.addEventListener('mouseout', function() { tooltip.style.opacity = '0'; });
+            }
+        });
+
+        // 2. APPLE STİLİ ÖZEL SELECT (DROPDOWN) DÖNÜŞTÜRÜCÜSÜ
+        document.querySelectorAll('select.apple-custom-select-source').forEach(select => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'apple-select-wrapper';
+            select.parentNode.insertBefore(wrapper, select);
+            wrapper.appendChild(select);
+            select.classList.add('d-none');
+
+            const trigger = document.createElement('div');
+            trigger.className = 'apple-select-trigger';
+            const seciliMetin = select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : 'Seçiniz';
+            trigger.innerHTML = `<span>${seciliMetin}</span> <i class="fas fa-chevron-down" style="font-size:0.75rem; color:#86868b;"></i>`;
+            wrapper.appendChild(trigger);
+
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'apple-select-options';
+            
+            Array.from(select.options).forEach((opt, index) => {
+                const optDiv = document.createElement('div');
+                optDiv.className = 'apple-select-option' + (opt.selected ? ' selected' : '');
+                optDiv.textContent = opt.text;
+                
+                optDiv.addEventListener('click', () => {
+                    select.selectedIndex = index;
+                    select.value = opt.value; // Form değerini zorla günceller
+                    select.dispatchEvent(new Event('change')); // Değişikliği tetikler
+                    trigger.querySelector('span').textContent = opt.text;
+                    
+                    optionsContainer.querySelectorAll('.apple-select-option').forEach(el => el.classList.remove('selected'));
+                    optDiv.classList.add('selected');
+                    
+                    optionsContainer.classList.remove('open');
+                    trigger.classList.remove('active');
+                });
+                optionsContainer.appendChild(optDiv);
+            });
+            wrapper.appendChild(optionsContainer);
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const acikMi = optionsContainer.classList.contains('open');
+                
+                document.querySelectorAll('.apple-select-options').forEach(el => el.classList.remove('open'));
+                document.querySelectorAll('.apple-select-trigger').forEach(el => el.classList.remove('active'));
+                
+                if (!acikMi) {
+                    optionsContainer.classList.add('open');
+                    trigger.classList.add('active');
+                }
+            });
+        });
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.apple-select-options').forEach(el => el.classList.remove('open'));
+            document.querySelectorAll('.apple-select-trigger').forEach(el => el.classList.remove('active'));
+        });
+    });
+    
+   function karsilastirmayaEkle(slug) {
+        let rawList = JSON.parse(localStorage.getItem('yemekvar_karsilastirma')) || [];
+        let list = rawList.filter(item => item && item !== "null" && item !== "undefined" && item.trim() !== "");
+
+        if (list.includes(slug)) {
+            bildirimGoster('error', "Bu paket zaten karşılaştırma listenizde!");
+            return;
+        }
+
+        if (list.length < 3) {
+            list.push(slug);
+            localStorage.setItem('yemekvar_karsilastirma', JSON.stringify(list));
+            bildirimGoster('success', "Paket başarıyla karşılaştırma listesine eklendi!");
+        } else {
+            bildirimGoster('error', "Karşılaştırma listesi dolu! En fazla 3 paket ekleyebilirsiniz.");
+        }
+    }
+    
+    function bildirimGoster(tip, mesaj) {
+        const toast = document.createElement('div'); 
+        let ikon = tip === 'success' ? 'fa-check' : 'fa-exclamation'; 
+        
+        toast.style.cssText = `
+            position: fixed; bottom: 40px; right: 40px; 
+            background: rgba(29,29,31,0.9); backdrop-filter: blur(10px); 
+            color: #fff; padding: 14px 24px; border-radius: 50px; 
+            z-index: 9999; font-weight: 500; font-family: 'Manrope', sans-serif; 
+            display: flex; align-items: center; gap: 12px; 
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); 
+            transform: translateY(100px); opacity: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        `;
+        toast.innerHTML = `<i class="fas ${ikon}"></i> <span>${mesaj}</span>`;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => { toast.style.transform = 'translateY(0)'; toast.style.opacity = '1'; }, 10);
+        setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 3000);
+    }
+
+    // 4. İSTATİSTİK SAYACI (SCROLL ANİMASYONU)
+    const statsSection = document.getElementById('stats-section');
+    let hasAnimated = false;
+
+    function animateCounters() {
+        const counters = document.querySelectorAll('.counter');
+        const floatCounters = document.querySelectorAll('.counter-float');
+        const speed = 40; // Animasyon hızı (Daha düşük = daha hızlı)
+
+        // Tam sayılar için
+        counters.forEach(counter => {
+            const updateCount = () => {
+                const target = +counter.getAttribute('data-target');
+                const count = +counter.innerText;
+                const inc = target / speed;
+
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + inc);
+                    setTimeout(updateCount, 30);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            updateCount();
+        });
+
+        // Ondalıklı sayılar için (4.9 gibi)
+        floatCounters.forEach(counter => {
+            const updateCount = () => {
+                const target = parseFloat(counter.getAttribute('data-target'));
+                const count = parseFloat(counter.innerText);
+                const inc = target / speed;
+
+                if (count < target) {
+                    counter.innerText = (count + inc).toFixed(1);
+                    setTimeout(updateCount, 30);
+                } else {
+                    counter.innerText = target.toFixed(1);
+                }
+            };
+            updateCount();
+        });
+    }
+
+    // Kullanıcı ilgili bölüme gelince animasyonu tetikle (Intersection Observer)
+    if (statsSection) {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !hasAnimated) {
+                hasAnimated = true;
+                animateCounters();
+            }
+        }, { threshold: 0.5 }); // Ekranın %50'si göründüğünde başlar
+
+        observer.observe(statsSection);
+    }
+</script>
+{% endblock %}

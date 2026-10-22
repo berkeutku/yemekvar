@@ -1,0 +1,470 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* APPLE GLOBAL RENKLER & TİPOGRAFİ */
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-text-gray: #86868b;
+        --apple-border: #d2d2d7;
+    }
+
+    body { background-color: var(--apple-light-bg); }
+    h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.04em; }
+
+    /* SOL TARAF: GÖRSEL VE İÇERİK KARTLARI */
+    .apple-detail-img {
+        width: 100%;
+        height: 450px;
+        object-fit: cover;
+        border-radius: 32px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+    }
+
+    .apple-firma-card {
+        background: #ffffff;
+        border-radius: 50px;
+        padding: 16px 32px 16px 16px;
+        display: inline-flex;
+        align-items: center;
+        gap: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        margin-top: -50px; 
+        position: relative;
+        z-index: 2;
+        margin-left: 30px;
+    }
+    
+    .apple-content-card {
+        background: #ffffff;
+        border-radius: 32px;
+        padding: 50px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        margin-top: 30px;
+    }
+
+    .apple-desc-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #515154;
+    }
+
+    /* SAĞ TARAF: YAPIŞKAN FORM VE SİYAH FİYAT ETİKETİ */
+    .apple-sticky-wrapper {
+        position: sticky;
+        top: 100px;
+    }
+
+    .apple-price-hero {
+        background: var(--apple-dark);
+        color: #ffffff;
+        padding: 30px;
+        border-radius: 32px;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    .apple-price-hero h2 {
+        font-size: 3rem;
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        margin: 0;
+    }
+    .apple-price-hero .price-subtitle {
+        font-size: 0.9rem;
+        color: #86868b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .apple-form-card {
+        background: #ffffff;
+        border-radius: 32px;
+        padding: 40px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.06);
+    }
+
+    /* FORMLARI APPLE STİLİNE ÇEVİRME */
+    .apple-custom-form input:not([type="checkbox"]):not([type="radio"]), 
+    .apple-custom-form textarea, 
+    .apple-custom-form select {
+        width: 100%;
+        background-color: var(--apple-light-bg);
+        border: 2px solid transparent;
+        border-radius: 14px;
+        padding: 16px 18px;
+        font-size: 1rem;
+        font-family: 'Manrope', sans-serif;
+        color: var(--apple-dark);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .apple-custom-form input::placeholder, 
+    .apple-custom-form textarea::placeholder {
+        color: #a1a1a6;
+        font-weight: 500;
+        opacity: 0.9;
+    }
+
+    .apple-custom-form input:not([type="checkbox"]):focus, 
+    .apple-custom-form textarea:focus,
+    .apple-custom-form select:focus {
+        background-color: #ffffff;
+        border-color: var(--apple-blue);
+        box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+        outline: none;
+    }
+
+    .main-field-label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--apple-text-gray);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    /* ==========================================
+       KESİN ÇÖZÜMLÜ CHECKBOX TASARIMI
+       ========================================== */
+    .custom-checkbox-container input[type="checkbox"] {
+        width: 24px !important;
+        height: 24px !important;
+        float: none !important;
+        margin: 0 !important;
+        cursor: pointer;
+        accent-color: var(--apple-blue);
+    }
+    .custom-checkbox-container .checkbox-item {
+        transition: all 0.2s ease;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+    .custom-checkbox-container .checkbox-item:hover {
+        border-color: var(--apple-border);
+        background-color: #ebebeb !important;
+    }
+
+    /* ALAN ALTI BİLGİ/UYARI METNİ */
+    .apple-field-helper {
+        font-size: 0.8rem;
+        color: var(--apple-text-gray);
+        margin-top: 8px;
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        line-height: 1.4;
+    }
+    .apple-field-helper i {
+        color: var(--apple-blue);
+        margin-top: 2px;
+    }
+
+    /* BUTONLAR */
+    .btn-apple-submit {
+        background: var(--apple-blue);
+        color: #ffffff;
+        border: none;
+        border-radius: 50px;
+        padding: 18px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        transition: 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    .btn-apple-submit:hover {
+        background: var(--apple-blue-hover);
+        transform: scale(1.02);
+        box-shadow: 0 10px 25px rgba(0, 113, 227, 0.3);
+    }
+    
+    .btn-apple-outline {
+        background: transparent;
+        color: var(--apple-dark);
+        border: 2px solid var(--apple-border);
+        border-radius: 50px;
+        padding: 16px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        transition: 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    .btn-apple-outline:hover {
+        border-color: var(--apple-dark);
+        background: var(--apple-light-bg);
+    }
+
+    @media (max-width: 991px) {
+        .apple-detail-img { height: 300px; border-radius: 20px; }
+        .apple-firma-card { margin-left: 15px; padding: 12px 20px 12px 12px; }
+        .apple-content-card, .apple-form-card { padding: 25px; border-radius: 24px; }
+    }
+</style>
+
+<div class="container py-5 mt-3 mb-5">
+    
+    <a href="javascript:history.back()" class="text-decoration-none fw-bold mb-4 d-inline-block" style="color: var(--apple-text-gray);">
+        <i class="fas fa-chevron-left me-2"></i> Geri Dön
+    </a>
+
+    <div class="row g-5">
+        
+        <div class="col-lg-7">
+            <h1 class="fw-bold text-dark mb-4" style="font-size: clamp(2rem, 4vw, 2.8rem); letter-spacing: -1px;">{{ paket.isim }}</h1>
+            
+            {% if paket.resim %}
+                <img src="{{ paket.resim.url }}" class="apple-detail-img" alt="{{ paket.isim }}">
+            {% else %}
+                <div class="apple-detail-img bg-light d-flex align-items-center justify-content-center">
+                    <i class="fas fa-image fa-4x text-muted opacity-25"></i>
+                </div>
+            {% endif %}
+
+            <div class="apple-firma-card">
+                <div class="firma-logo bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 55px; height: 55px; overflow: hidden;">
+                    {% if paket.firma.logo %}
+                        <img src="{{ paket.firma.logo.url }}" alt="{{ paket.firma.isim }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <i class="fas fa-store text-primary fs-4"></i>
+                    {% endif %}
+                </div>
+                <div>
+                    <h4 class="fw-bold mb-1" style="font-size: 1.2rem; letter-spacing: -0.5px; color: var(--apple-dark);">{{ paket.firma.isim }}</h4>
+                    <div class="d-flex align-items-center gap-3" style="font-size: 0.9rem;">
+                        <div class="d-flex flex-wrap align-items-center gap-2 mt-2" style="font-size: 0.85rem;">
+                            <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 fw-bold" style="letter-spacing: -0.2px;">
+                                <i class="fas fa-check-circle me-1"></i> %98 Zamanında Teslimat
+                            </span>
+                            <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 fw-bold" style="letter-spacing: -0.2px;">
+                                <i class="fas fa-shield-alt me-1"></i> ISO 22000 Hijyen Onaylı
+                            </span>
+                        </div>
+                        <span class="text-muted fw-semibold"><i class="fas fa-map-marker-alt"></i> {{ paket.firma.sehir }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="apple-content-card">
+                <h3 class="fw-bold mb-4" style="letter-spacing: -0.5px;">Paket İçeriği ve Detaylar</h3>
+                <div class="apple-desc-text">
+                    {{ paket.aciklama|linebreaks }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="apple-sticky-wrapper">
+                
+                <div class="apple-price-hero">
+                    <h2>{{ paket.fiyat }} ₺</h2>
+                    <span class="price-subtitle">Referans Başlangıç Fiyatı</span>
+                </div>
+
+                <div class="apple-form-card">
+                    <h3 class="fw-bold mb-4" style="letter-spacing: -0.5px;">Teklif Bilgileri</h3>
+                    
+                    <form method="POST" class="apple-custom-form">
+                        {% csrf_token %}
+                        
+                        <!-- YENİ: BİREYSEL MOD UYARISI -->
+                        {% if paket.hedef_kitle == 'Bireysel' %}
+                            <div class="alert alert-success bg-opacity-10 border-success border-opacity-25 mb-4" style="border-radius: 20px;">
+                                <h6 class="fw-bold text-success mb-1"><i class="fas fa-leaf me-2"></i>Bireysel Abonelik Modu</h6>
+                                <small class="text-success">Bu paket için minimum 20 günlük abonelik kuralı geçerlidir.</small>
+                            </div>
+                        {% endif %}
+
+                        {% for field in form %}
+                            {% if field.name == 'abonelik_suresi' and not paket.abonelik_uygun_mu %}
+                                <!-- Gösterme -->
+                            {% else %}
+                                <div class="mb-4">
+                                    <label for="{{ field.id_for_label }}" class="main-field-label">{{ field.label }}</label>
+                                    
+                                    {% if field.name == 'secilen_ek_hizmetler' %}
+                                        <div class="custom-checkbox-container d-flex flex-column gap-2 mt-2">
+                                            {% for checkbox in field %}
+                                                <label for="{{ checkbox.id_for_label }}" class="checkbox-item d-flex align-items-center bg-light p-3 rounded-4 mb-0 w-100 m-0">
+                                                    {{ checkbox.tag }}
+                                                    <span class="ms-3 fw-bold text-dark" style="font-size: 0.95rem;">
+                                                        {{ checkbox.choice_label }}
+                                                    </span>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ field }}
+                                    {% endif %}
+                                    
+                                    {% if field.name == 'kisi_sayisi' %}
+                                        <div class="apple-field-helper">
+                                            <i class="fas fa-info-circle"></i> 
+                                            <span>Kişi sayısı arttıkça kişi başı fiyat düşebilir. En az <strong class="text-dark">{{ paket.min_kisi_sayisi }} kişi</strong> girilmelidir.</span>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if field.name == 'abonelik_suresi' %}
+                                        <div class="apple-field-helper">
+                                            <i class="fas fa-calendar-alt mt-1"></i> 
+                                            {% if paket.hedef_kitle == 'Bireysel' %}
+                                                <span>Avantajlı ekonomik fiyatlandırma için abonelik minimum <strong>20 günlük</strong> olmalıdır.</span>
+                                            {% else %}
+                                                <span>Bu paketi düzenli olarak (abonelik) almak isterseniz kaç gün süreceğini yazın. Tek seferlik ise boş bırakın.</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+
+                                    <!-- YENİ: TESLİMAT ŞEKLİ YARDIMCI METNİ -->
+                                    {% if field.name == 'teslimat_sekli' %}
+                                        <div class="apple-field-helper">
+                                            <i class="fas fa-thermometer-half mt-1"></i> 
+                                            <span>Yemeğinizi sıcak mı, yoksa daha sonra ısıtmak üzere soğuk mu teslim almak istersiniz?</span>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if field.errors %}
+                                        <div class="text-danger small mt-2 fw-bold"><i class="fas fa-exclamation-circle"></i> {{ field.errors|striptags }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- GİRİŞ YAPMIŞSA BUTONLARI GÖSTER, YAPMAMIŞSA UYARI VE GİRİŞ LİNKİ GÖSTER -->
+                        {% if request.user.is_authenticated %}
+                            
+                            <!-- YENİ: BİREYSEL ve KURUMSAL BUTON AYRIMI -->
+                            {% if paket.hedef_kitle == 'Bireysel' %}
+                                <button type="submit" class="btn-apple-submit w-100 mt-4" style="background-color: var(--sys-green);">
+                                    Aboneliği Başlat <i class="fas fa-check-circle ms-2"></i>
+                                </button>
+                            {% else %}
+                                <button type="submit" class="btn-apple-submit w-100 mt-4">
+                                    Firmaya Talebini İlet <i class="fas fa-paper-plane"></i>
+                                </button>
+                                
+                                <button type="button" class="btn-apple-outline w-100 mt-3" data-bs-toggle="modal" data-bs-target="#tadimModal">
+                                    <i class="fas fa-utensils"></i> Ücretsiz Tadım Randevusu Al
+                                </button>
+                            {% endif %}
+
+                        {% else %}
+                            <div class="alert alert-warning text-center mt-4 mb-0" style="border-radius: 20px; background: rgba(255, 159, 10, 0.1); border: 1px solid rgba(255, 159, 10, 0.3);">
+                                <i class="fas fa-lock fs-3 mb-2" style="color: #ff9f0a;"></i>
+                                <h6 class="fw-bold text-dark mb-3">Teklif Almak İçin Giriş Yapın</h6>
+                                <a href="{% url 'giris' %}" class="btn-apple-submit w-100 text-decoration-none" style="padding: 14px;">
+                                    Giriş Yap veya Kayıt Ol
+                                </a>
+                            </div>
+                        {% endif %}
+                        
+                    </form>
+
+                    <p class="text-center text-muted mt-4 mb-0" style="font-size: 0.85rem; font-weight: 500;">
+                        Bilgileriniz sadece <strong style="color: var(--apple-dark);">{{ paket.firma.isim }}</strong> ile paylaşılacaktır.
+                    </p>
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="tadimModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius: 32px; box-shadow: 0 25px 50px rgba(0,0,0,0.15);">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="fw-bold text-dark" style="letter-spacing: -0.5px; font-size: 1.4rem;">Tadım Randevusu Planla</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted mb-4" style="font-size: 0.95rem; line-height: 1.5;">Menüyü organizasyonunuz için onaylamadan önce kalitemizi deneyimleyin. Talebinizi hemen oluşturun.</p>
+                
+                <form method="POST" action="" class="apple-custom-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="tadim_randevusu" value="1">
+                    
+                    <div class="mb-3">
+                        <label class="main-field-label">Adınız Soyadınız</label>
+                        <input type="text" name="isim" required placeholder="Örn: Hakan Yılmaz">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="main-field-label">Şirket / Kurum Adı</label>
+                        <input type="text" name="sirket" placeholder="İsteğe Bağlı">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="main-field-label">Telefon Numarası</label>
+                        <input type="tel" name="telefon" required placeholder="Örn: 05XX XXX XX XX">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="main-field-label">Tercih Edilen Tarih</label>
+                        <input type="date" name="tarih" required>
+                    </div>
+
+                    {% if request.user.is_authenticated %}
+                        <button type="submit" class="btn-apple-submit w-100 py-3" style="border-radius: 50px;">
+                            Tadım Talebini Gönder <i class="fas fa-check-circle"></i>
+                        </button>
+                    {% else %}
+                        <a href="{% url 'giris' %}" class="btn-apple-submit w-100 text-decoration-none py-3" style="border-radius: 50px; background: #ff9f0a;">
+                            Devam Etmek İçin Giriş Yapın
+                        </a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ornekMetinler = {
+            'isim': 'Örn: Ahmet Yılmaz',
+            'telefon': 'Örn: 05XX XXX XX XX',
+            'mesaj': 'Menü detayı, teslimat saati vb. özel talepleriniz...',
+            'abonelik_suresi': 'Örn: 20'
+        };
+
+        for (const [alanAdi, ornekMetin] of Object.entries(ornekMetinler)) {
+            const inputElemani = document.querySelector(`form:not(.modal form) [name="${alanAdi}"]`);
+            if (inputElemani) {
+                inputElemani.setAttribute('placeholder', ornekMetin);
+            }
+        }
+        
+        const tarihInput = document.querySelector('form:not(.modal form) input[name="etkinlik_tarihi"]');
+        if (tarihInput && tarihInput.type === 'text') {
+            tarihInput.setAttribute('placeholder', 'gg.aa.yyyy');
+        }
+
+        const kisiInput = document.querySelector('form:not(.modal form) input[name="kisi_sayisi"]');
+        if (kisiInput) {
+            kisiInput.setAttribute('min', '{{ paket.min_kisi_sayisi }}');
+            
+            if (!kisiInput.value || parseInt(kisiInput.value) < parseInt('{{ paket.min_kisi_sayisi }}')) {
+                kisiInput.value = '{{ paket.min_kisi_sayisi }}';
+            }
+            
+            kisiInput.addEventListener('change', function() {
+                if (parseInt(this.value) < parseInt('{{ paket.min_kisi_sayisi }}')) {
+                    this.value = '{{ paket.min_kisi_sayisi }}';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

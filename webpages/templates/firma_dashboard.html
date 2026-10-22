@@ -1,0 +1,865 @@
+{% extends 'esnaf_base.html' %}
+
+{% block content %}
+<style>
+    /* APPLE DASHBOARD TEMA */
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-gray: #86868b;
+        --apple-border: #d2d2d7;
+        /* Apple Sistem Renkleri */
+        --sys-blue: #0071e3;
+        --sys-orange: #ff9f0a;
+        --sys-teal: #30b0c7;
+        --sys-red: #ff3b30;
+        --sys-green: #34c759;
+    }
+
+    /* APPLE BENTO KARTLARI */
+    .apple-dash-card {
+        background: #ffffff;
+        border-radius: 24px;
+        border: 1px solid rgba(0,0,0,0.02);
+        box-shadow: 0 4px 24px rgba(0,0,0,0.03);
+        transition: box-shadow 0.3s ease;
+        padding: 24px;
+    }
+    .apple-dash-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
+
+    /* APPLE SEGMENTED CONTROL (Sekmeler) */
+    .apple-tabs {
+        background-color: #e3e3e8;
+        padding: 4px;
+        border-radius: 12px;
+        display: inline-flex;
+        gap: 2px;
+    }
+    .apple-tabs .nav-link {
+        border-radius: 10px;
+        color: #515154;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 8px 20px;
+        border: none;
+        transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .apple-tabs .nav-link:hover { color: #1d1d1f; }
+    .apple-tabs .nav-link.active {
+        background-color: #ffffff;
+        color: #1d1d1f;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    /* APPLE TABLO STİLİ */
+    .apple-table { width: 100%; margin-bottom: 0; }
+    .apple-table th {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--apple-gray);
+        font-weight: 600;
+        border-bottom: 1px solid var(--apple-border);
+        padding: 16px 12px;
+    }
+    .apple-table td {
+        padding: 16px 12px;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(0,0,0,0.04);
+        font-size: 0.9rem;
+        color: var(--apple-dark);
+    }
+    .apple-table tbody tr { transition: background-color 0.2s; }
+    .apple-table tbody tr:hover { background-color: #fafafa; }
+
+    /* APPLE ROZETLER (Badges) */
+    .apple-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+    }
+    .badge-warning { background: rgba(255, 159, 10, 0.1); color: #b26c00; border: 1px solid rgba(255, 159, 10, 0.2); }
+    .badge-info { background: rgba(48, 176, 199, 0.1); color: #1e7180; border: 1px solid rgba(48, 176, 199, 0.2); }
+    .badge-success { background: rgba(52, 199, 89, 0.1); color: #248a3d; border: 1px solid rgba(52, 199, 89, 0.2); }
+    .badge-danger { background: rgba(255, 59, 48, 0.1); color: #c41e14; border: 1px solid rgba(255, 59, 48, 0.2); }
+    .badge-primary { background: rgba(0, 113, 227, 0.1); color: var(--apple-blue); border: 1px solid rgba(0, 113, 227, 0.2); }
+
+    /* YENİ EKLENEN: SICAK / SOĞUK TESLİMAT ROZETLERİ */
+    .ext-badge { font-size: 0.75rem; background: #e8e8ed; color: var(--apple-dark); padding: 4px 8px; border-radius: 6px; font-weight: 600; display: inline-block; margin-right: 4px; border: 1px solid #d2d2d7;}
+    .ext-badge-hot { background: rgba(255, 59, 48, 0.1); color: #ff3b30; border-color: rgba(255, 59, 48, 0.2); }
+    .ext-badge-cold { background: rgba(50, 173, 230, 0.1); color: #0077ed; border-color: rgba(50, 173, 230, 0.2); }
+
+    /* PAKET KARTLARI (Paketlerim Sekmesi) */
+    .apple-package-card {
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.03);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        transition: transform 0.3s;
+    }
+    .apple-package-card:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.08); }
+
+    /* DROPDOWN (Açılır Menü) */
+    .apple-dropdown-menu {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+        padding: 8px;
+    }
+    .apple-dropdown-item {
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+    }
+    .apple-dropdown-item:hover { background-color: var(--apple-light-bg); }
+
+    /* LOG LİSTESİ */
+    .apple-log-list { border-radius: 16px; overflow: hidden; border: 1px solid rgba(0,0,0,0.05); }
+    .apple-log-item { padding: 16px; border-bottom: 1px solid rgba(0,0,0,0.03); font-size: 0.85rem; }
+    .apple-log-item:last-child { border-bottom: none; }
+
+    /* KANBAN PANOSU STİLLERİ */
+    .kanban-board { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; min-height: 400px; }
+    .kanban-column { flex: 1; min-width: 320px; background: #f5f5f7; border-radius: 20px; padding: 20px; border: 1px solid rgba(0,0,0,0.04); display: flex; flex-direction: column; }
+    .kanban-column h5 { font-weight: 700; font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .kanban-cards { flex-grow: 1; display: flex; flex-direction: column; gap: 15px; min-height: 100px; }
+    .kanban-card { background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: grab; transition: 0.2s; border: 1px solid rgba(0,0,0,0.02); }
+    .kanban-card:active { cursor: grabbing; }
+    .kanban-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+
+    /* FORMLAR İÇİN APPLE STİLİ (Modal İçin) */
+    .apple-custom-form input:not([type="checkbox"]):not([type="radio"]), 
+    .apple-custom-form textarea, 
+    .apple-custom-form select {
+        width: 100%;
+        background-color: var(--apple-light-bg);
+        border: 2px solid transparent;
+        border-radius: 14px;
+        padding: 14px 18px;
+        font-size: 1rem;
+        font-family: 'Manrope', sans-serif;
+        color: var(--apple-dark);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .apple-custom-form input:not([type="checkbox"]):focus, 
+    .apple-custom-form textarea:focus,
+    .apple-custom-form select:focus {
+        background-color: #ffffff;
+        border-color: var(--apple-blue);
+        box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+        outline: none;
+    }
+    .apple-custom-form input[type="checkbox"] {
+        width: 24px;
+        height: 24px;
+        accent-color: var(--apple-blue);
+        cursor: pointer;
+    }
+</style>
+
+<!-- GRAFİKLER BÖLÜMÜ BAŞLANGICI -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="row g-4 mt-2 mb-5">
+    <div class="col-md-4">
+        <div class="apple-dash-card h-100">
+            <canvas id="durumGrafigi"></canvas>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="apple-dash-card h-100">
+            <canvas id="paketGrafigi"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Verileri Güvenli Bir Şekilde HTML'e Gömüyoruz -->
+{{ durum_verileri|json_script:"durum-data" }}
+{{ paket_isimleri|json_script:"paket-labels" }}
+{{ talep_sayilari|json_script:"talep-data" }}
+
+<script>
+    const durumVerileri = JSON.parse(document.getElementById('durum-data').textContent);
+    const paketIsimleri = JSON.parse(document.getElementById('paket-labels').textContent);
+    const talepSayilari = JSON.parse(document.getElementById('talep-data').textContent);
+
+    Chart.defaults.font.family = "'Manrope', -apple-system, sans-serif";
+    Chart.defaults.color = '#86868b';
+
+    new Chart(document.getElementById('durumGrafigi'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Bekliyor', 'İletişime Geçildi', 'Tamamlandı', 'Reddedildi'],
+            datasets: [{
+                data: durumVerileri,
+                backgroundColor: ['#ff9f0a', '#30b0c7', '#34c759', '#ff3b30'],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: { 
+            plugins: { 
+                title: { display: true, text: 'Talep Durum Analizi', font: { size: 14, weight: 'bold' }, color: '#1d1d1f', padding: {bottom: 20} },
+                legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } }
+            },
+            cutout: '70%'
+        }
+    });
+
+    new Chart(document.getElementById('paketGrafigi'), {
+        type: 'bar',
+        data: {
+            labels: paketIsimleri,
+            datasets: [{
+                label: 'Talep Sayısı',
+                data: talepSayilari,
+                backgroundColor: '#0071e3',
+                borderRadius: 6,
+                barThickness: 30
+            }]
+        },
+        options: { 
+            plugins: { 
+                title: { display: true, text: 'Hangi Menü Kaç Kez İstendi?', font: { size: 14, weight: 'bold' }, color: '#1d1d1f', padding: {bottom: 20} },
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, border: { display: false } },
+                x: { grid: { display: false }, border: { display: false } }
+            }
+        }
+    });
+</script>
+<!-- GRAFİKLER BÖLÜMÜ BİTİŞİ -->
+
+<div class="mb-4">
+    <!-- Üst Başlık ve Durum -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0 text-dark" style="letter-spacing: -1px;">
+            <i class="fas fa-store-alt me-2" style="color: var(--apple-blue);"></i>{{ firma.isim }}
+        </h2>
+        <span class="apple-badge badge-primary px-3 py-2 fs-6">
+            <i class="fas fa-check-circle me-1"></i> Aktif Satıcı
+        </span>
+    </div>
+
+    <!-- Sekmeler (Tabs - Apple Segmented Control) -->
+    <ul class="nav nav-pills apple-tabs mb-4" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pills-siparis-tab" data-bs-toggle="pill" data-bs-target="#pills-siparis" type="button" role="tab">
+                <i class="fas fa-envelope-open-text"></i> Gelen Talepler
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-paket-tab" data-bs-toggle="pill" data-bs-target="#pills-paket" type="button" role="tab">
+                <i class="fas fa-box-open"></i> Paketlerim
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-anlik-tab" data-bs-toggle="pill" data-bs-target="#pills-anlik" type="button" role="tab">
+                <i class="fas fa-motorcycle"></i> Anlık Siparişler
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-radar-tab" data-bs-toggle="pill" data-bs-target="#pills-radar" type="button" role="tab">
+                <i class="fas fa-satellite-dish text-danger"></i> Bölge Fırsatları (Radar)
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pills-tabContent">
+
+        <!-- ==========================================
+             1. TALEPLER SEKMESİ (B2B ve B2C OLARAK İKİYE AYRILDI)
+             ========================================== -->
+        <div class="tab-pane fade show active" id="pills-siparis" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+                <h5 class="fw-bold m-0 text-dark">Operasyonel Kanban Panosu</h5>
+                <span class="text-muted small">Sipariş kartlarını sürükleyerek durumlarını güncelleyebilirsiniz.</span>
+            </div>
+
+            <!-- KURUMSAL KANBAN PANOSU -->
+            <h4 class="fw-bold mb-3 mt-4 text-primary"><i class="fas fa-building me-2"></i>Kurumsal (B2B) Talepleri</h4>
+            <div class="kanban-board mb-5">
+                <!-- 1. KOLON: BEKLEYENLER -->
+                <div class="kanban-column" ondragover="allowDrop(event)" ondrop="drop(event, 'Bekliyor')">
+                    <h5 class="text-warning"><i class="fas fa-clock me-2"></i> Bekleyenler</h5>
+                    <div class="kanban-cards">
+                        {% for siparis in kurumsal_talepler %}
+                            {% if siparis.durum == 'Bekliyor' or siparis.durum == 'Revize Edildi' %}
+                            <div class="kanban-card" draggable="true" ondragstart="drag(event)" id="siparis-{{ siparis.id }}" data-id="{{ siparis.id }}">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold text-dark">{{ siparis.isim }}</span>
+                                    <span class="badge bg-light text-dark">{{ siparis.kisi_sayisi }} Kişi</span>
+                                </div>
+                                <p class="text-muted small mb-2 fw-bold" style="color: var(--apple-dark);">{{ siparis.paket.isim }}</p>
+                                
+                                {% if siparis.abonelik_suresi %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 mb-2 px-2 py-1"><i class="fas fa-sync-alt"></i> {{ siparis.abonelik_suresi }} Gün Abonelik</span><br>
+                                {% endif %}
+
+                                {% if siparis.secilen_ek_hizmetler.all %}
+                                    <div class="small text-muted mb-2">
+                                        <i class="fas fa-plus-circle text-success"></i> <strong>Ekstralar:</strong>
+                                        {% for ek in siparis.secilen_ek_hizmetler.all %}{{ ek.isim }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                
+                                {% if siparis.revize_fiyat %}
+                                    <div class="alert alert-info py-1 px-2 small mb-2">
+                                        <strong>Revize Teklif:</strong> {{ siparis.revize_fiyat }} ₺
+                                    </div>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-between align-items-center pt-2 mt-2 border-top">
+                                    <span class="small text-secondary"><i class="fas fa-phone me-1"></i> {{ siparis.telefon }}</span>
+                                    <button class="btn btn-sm btn-outline-dark rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#revizeModal-{{ siparis.id }}">Pazarlık</button>
+                                </div>
+                            </div>
+                            
+                            <!-- PAZARLIK MODALI -->
+                            <div class="modal fade" id="revizeModal-{{ siparis.id }}" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0" style="border-radius: 24px;">
+                                        <form action="{% url 'teklif_revize_et' siparis.id %}" method="POST" class="apple-custom-form">
+                                            {% csrf_token %}
+                                            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                                                <h5 class="modal-title fw-bold">Teklif Revize Et</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body px-4 py-4">
+                                                <div class="mb-3">
+                                                    <label>Yeni Fiyat Teklifi (₺)</label>
+                                                    <input type="number" name="revize_fiyat" value="{{ siparis.revize_fiyat|default:'' }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label>Müşteriye Notunuz</label>
+                                                    <textarea name="revize_notu" rows="3" placeholder="Fiyatı şu sebeple güncelliyorum...">{{ siparis.revize_notu|default:'' }}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                                                <button type="submit" class="btn btn-dark w-100 rounded-pill py-3 fw-bold fs-5">Müşteriye İlet</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 2. KOLON: HAZIRLANANLAR -->
+                <div class="kanban-column" ondragover="allowDrop(event)" ondrop="drop(event, 'Hazırlanıyor')">
+                    <h5 class="text-primary"><i class="fas fa-fire me-2"></i> Hazırlanıyor</h5>
+                    <div class="kanban-cards">
+                        {% for siparis in kurumsal_talepler %}
+                            {% if siparis.durum == 'Hazırlanıyor' %}
+                            <div class="kanban-card" draggable="true" ondragstart="drag(event)" id="siparis-{{ siparis.id }}" data-id="{{ siparis.id }}">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold text-dark">{{ siparis.isim }}</span>
+                                    <span class="badge bg-light text-dark">{{ siparis.kisi_sayisi }} Kişi</span>
+                                </div>
+                                <p class="text-muted small mb-2 fw-bold" style="color: var(--apple-dark);">{{ siparis.paket.isim }}</p>
+                                
+                                {% if siparis.abonelik_suresi %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 mb-2 px-2 py-1"><i class="fas fa-sync-alt"></i> {{ siparis.abonelik_suresi }} Gün Abonelik</span><br>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-between align-items-center pt-2 mt-2 border-top">
+                                    <span class="small text-secondary"><i class="fas fa-phone me-1"></i> {{ siparis.telefon }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 3. KOLON: TAMAMLANANLAR -->
+                <div class="kanban-column" ondragover="allowDrop(event)" ondrop="drop(event, 'Tamamlandı')">
+                    <h5 class="text-success"><i class="fas fa-check-circle me-2"></i> Tamamlandı</h5>
+                    <div class="kanban-cards">
+                        {% for siparis in kurumsal_talepler %}
+                            {% if siparis.durum == 'Tamamlandı' %}
+                            <div class="kanban-card" draggable="true" ondragstart="drag(event)" id="siparis-{{ siparis.id }}" data-id="{{ siparis.id }}">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold text-dark">{{ siparis.isim }}</span>
+                                    <span class="badge bg-success bg-opacity-10 text-success">{{ siparis.kisi_sayisi }} Kişi</span>
+                                </div>
+                                <p class="text-muted small mb-2 fw-bold" style="color: var(--apple-dark);">{{ siparis.paket.isim }}</p>
+                                
+                                {% if siparis.abonelik_suresi %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 mb-2 px-2 py-1"><i class="fas fa-sync-alt"></i> {{ siparis.abonelik_suresi }} Gün Abonelik</span><br>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-between align-items-center pt-2 mt-2 border-top">
+                                    <span class="small text-success fw-bold">Teslim Edildi</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- BİREYSEL KANBAN PANOSU -->
+            <h4 class="fw-bold mb-3 mt-5 text-success"><i class="fas fa-user me-2"></i>Bireysel (B2C) Abonelik Talepleri</h4>
+            <div class="kanban-board">
+                <!-- 1. KOLON: BEKLEYENLER -->
+                <div class="kanban-column" ondragover="allowDrop(event)" ondrop="drop(event, 'Bekliyor')">
+                    <h5 class="text-warning"><i class="fas fa-clock me-2"></i> Bekleyenler</h5>
+                    <div class="kanban-cards">
+                        {% for siparis in bireysel_talepler %}
+                            {% if siparis.durum == 'Bekliyor' or siparis.durum == 'Revize Edildi' %}
+                            <div class="kanban-card border-success border-opacity-50" draggable="true" ondragstart="drag(event)" id="siparis-{{ siparis.id }}" data-id="{{ siparis.id }}">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold text-dark">{{ siparis.isim }}</span>
+                                    <span class="badge bg-light text-dark">{{ siparis.kisi_sayisi }} Kişi</span>
+                                </div>
+                                <p class="text-muted small mb-2 fw-bold" style="color: var(--apple-dark);">{{ siparis.paket.isim }}</p>
+                                
+                                {% if siparis.abonelik_suresi %}
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 mb-2 px-2 py-1"><i class="fas fa-sync-alt"></i> {{ siparis.abonelik_suresi }} Gün Abonelik</span><br>
+                                    
+                                    <!-- YENİ EKLENEN: Sıcak/Soğuk Teslimat Bilgisi -->
+                                    {% if siparis.teslimat_sekli == 'Sıcak' %}
+                                        <span class="ext-badge ext-badge-hot mb-2"><i class="fas fa-fire me-1"></i>Sıcak Teslim</span>
+                                    {% elif siparis.teslimat_sekli == 'Soğuk' %}
+                                        <span class="ext-badge ext-badge-cold mb-2"><i class="fas fa-snowflake me-1"></i>Soğuk Teslim</span>
+                                    {% endif %}
+                                    <br>
+                                {% endif %}
+
+                                {% if siparis.revize_fiyat %}
+                                    <div class="alert alert-info py-1 px-2 small mb-2">
+                                        <strong>Revize Teklif:</strong> {{ siparis.revize_fiyat }} ₺
+                                    </div>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-between align-items-center pt-2 mt-2 border-top">
+                                    <span class="small text-secondary"><i class="fas fa-phone me-1"></i> {{ siparis.telefon }}</span>
+                                    <button class="btn btn-sm btn-outline-success rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#revizeModal-{{ siparis.id }}">İletişime Geç</button>
+                                </div>
+                            </div>
+                            
+                            <!-- PAZARLIK MODALI (Bireysel) -->
+                            <div class="modal fade" id="revizeModal-{{ siparis.id }}" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0" style="border-radius: 24px;">
+                                        <form action="{% url 'teklif_revize_et' siparis.id %}" method="POST" class="apple-custom-form">
+                                            {% csrf_token %}
+                                            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                                                <h5 class="modal-title fw-bold text-success">Müşteriye Ulaş & Fiyat Güncelle</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body px-4 py-4">
+                                                <div class="mb-3">
+                                                    <label>Yeni Fiyat Teklifi (₺)</label>
+                                                    <input type="number" name="revize_fiyat" value="{{ siparis.revize_fiyat|default:'' }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label>Müşteriye Notunuz</label>
+                                                    <textarea name="revize_notu" rows="3" placeholder="Fiyatı şu sebeple güncelliyorum...">{{ siparis.revize_notu|default:'' }}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                                                <button type="submit" class="btn btn-success w-100 rounded-pill py-3 fw-bold fs-5">Müşteriye İlet</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 2. KOLON: HAZIRLANANLAR -->
+                <div class="kanban-column" ondragover="allowDrop(event)" ondrop="drop(event, 'Hazırlanıyor')">
+                    <h5 class="text-primary"><i class="fas fa-fire me-2"></i> Hazırlanıyor</h5>
+                    <div class="kanban-cards">
+                        {% for siparis in bireysel_talepler %}
+                            {% if siparis.durum == 'Hazırlanıyor' %}
+                            <div class="kanban-card border-success border-opacity-50" draggable="true" ondragstart="drag(event)" id="siparis-{{ siparis.id }}" data-id="{{ siparis.id }}">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold text-dark">{{ siparis.isim }}</span>
+                                    <span class="badge bg-light text-dark">{{ siparis.kisi_sayisi }} Kişi</span>
+                                </div>
+                                <p class="text-muted small mb-2 fw-bold" style="color: var(--apple-dark);">{{ siparis.paket.isim }}</p>
+                                
+                                {% if siparis.abonelik_suresi %}
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 mb-2 px-2 py-1"><i class="fas fa-sync-alt"></i> {{ siparis.abonelik_suresi }} Gün Abonelik</span><br>
+                                    
+                                    <!-- YENİ EKLENEN: Sıcak/Soğuk Teslimat Bilgisi -->
+                                    {% if siparis.teslimat_sekli == 'Sıcak' %}
+                                        <span class="ext-badge ext-badge-hot mb-2"><i class="fas fa-fire me-1"></i>Sıcak Teslim</span>
+                                    {% elif siparis.teslimat_sekli == 'Soğuk' %}
+                                        <span class="ext-badge ext-badge-cold mb-2"><i class="fas fa-snowflake me-1"></i>Soğuk Teslim</span>
+                                    {% endif %}
+                                    <br>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-between align-items-center pt-2 mt-2 border-top">
+                                    <span class="small text-secondary"><i class="fas fa-phone me-1"></i> {{ siparis.telefon }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 3. KOLON: TAMAMLANANLAR -->
+                <div class="kanban-column" ondragover="allowDrop(event)" ondrop="drop(event, 'Tamamlandı')">
+                    <h5 class="text-success"><i class="fas fa-check-circle me-2"></i> Tamamlandı</h5>
+                    <div class="kanban-cards">
+                        {% for siparis in bireysel_talepler %}
+                            {% if siparis.durum == 'Tamamlandı' %}
+                            <div class="kanban-card border-success border-opacity-50" draggable="true" ondragstart="drag(event)" id="siparis-{{ siparis.id }}" data-id="{{ siparis.id }}">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold text-dark">{{ siparis.isim }}</span>
+                                    <span class="badge bg-success bg-opacity-10 text-success">{{ siparis.kisi_sayisi }} Kişi</span>
+                                </div>
+                                <p class="text-muted small mb-2 fw-bold" style="color: var(--apple-dark);">{{ siparis.paket.isim }}</p>
+                                
+                                {% if siparis.abonelik_suresi %}
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 mb-2 px-2 py-1"><i class="fas fa-sync-alt"></i> {{ siparis.abonelik_suresi }} Gün Abonelik</span><br>
+                                    
+                                    <!-- YENİ EKLENEN: Sıcak/Soğuk Teslimat Bilgisi -->
+                                    {% if siparis.teslimat_sekli == 'Sıcak' %}
+                                        <span class="ext-badge ext-badge-hot mb-2"><i class="fas fa-fire me-1"></i>Sıcak Teslim</span>
+                                    {% elif siparis.teslimat_sekli == 'Soğuk' %}
+                                        <span class="ext-badge ext-badge-cold mb-2"><i class="fas fa-snowflake me-1"></i>Soğuk Teslim</span>
+                                    {% endif %}
+                                    <br>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-between align-items-center pt-2 mt-2 border-top">
+                                    <span class="small text-success fw-bold">Teslim Edildi</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             2. PAKETLERİM SEKMESİ (B2B ve B2C OLARAK İKİYE AYRILDI)
+             ========================================== -->
+        <div class="tab-pane fade" id="pills-paket" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+                <h5 class="fw-bold m-0 text-dark">Yayındaki Paketleriniz</h5>
+                <button class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#paketEkleModal">
+                    <i class="fas fa-plus me-2"></i> Yeni Paket Ekle
+                </button>
+            </div>
+
+            <!-- KURUMSAL PAKETLER -->
+            <h4 class="fw-bold mb-3 mt-4 text-primary"><i class="fas fa-building me-2"></i>Kurumsal B2B Paketleri</h4>
+            <div class="row g-4 mb-5">
+                {% for paket in kurumsal_paketler %}
+                <div class="col-md-4 col-lg-3">
+                    <div class="apple-package-card h-100 d-flex flex-column">
+                        {% if paket.resim %}
+                        <img src="{{ paket.resim.url }}" class="card-img-top" alt="{{ paket.isim }}" style="height: 180px; object-fit: cover;">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center" style="height: 180px; background-color: #f5f5f7;">
+                            <i class="fas fa-image fa-3x" style="color: #d2d2d7;"></i>
+                        </div>
+                        {% endif %}
+                        <div class="p-3 d-flex flex-column flex-grow-1">
+                            <div class="mb-2">
+                                <span class="badge bg-light text-secondary border rounded-pill fw-medium px-2 py-1" style="font-size: 10px;">{{ paket.hizmet.baslik }}</span>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">{{ paket.isim }}</h6>
+                            
+                            {% if paket.abonelik_uygun_mu %}
+                                <div class="mt-2"><span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fas fa-sync-alt"></i> Aboneliğe Uygun</span></div>
+                            {% endif %}
+
+                            <p class="fw-bold mt-auto mb-0" style="color: var(--apple-dark); font-size: 1.1rem;">{{ paket.fiyat }} ₺</p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="p-4 bg-white rounded-4 shadow-sm text-muted text-center border">
+                        <p class="mb-0 fw-bold">Kayıtlı Kurumsal B2B paketiniz bulunmuyor.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- BİREYSEL PAKETLER -->
+            <h4 class="fw-bold mb-3 mt-4 text-success"><i class="fas fa-user me-2"></i>Bireysel Abonelik Paketleri</h4>
+            <div class="row g-4">
+                {% for paket in bireysel_paketler %}
+                <div class="col-md-4 col-lg-3">
+                    <div class="apple-package-card h-100 d-flex flex-column border-success border-opacity-50">
+                        {% if paket.resim %}
+                        <img src="{{ paket.resim.url }}" class="card-img-top" alt="{{ paket.isim }}" style="height: 180px; object-fit: cover;">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center" style="height: 180px; background-color: #f5f5f7;">
+                            <i class="fas fa-image fa-3x" style="color: #d2d2d7;"></i>
+                        </div>
+                        {% endif %}
+                        <div class="p-3 d-flex flex-column flex-grow-1">
+                            <div class="mb-2">
+                                <span class="badge bg-light text-secondary border rounded-pill fw-medium px-2 py-1" style="font-size: 10px;">{{ paket.hizmet.baslik }}</span>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">{{ paket.isim }}</h6>
+                            
+                            {% if paket.abonelik_uygun_mu %}
+                                <div class="mt-2"><span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fas fa-sync-alt"></i> Aboneliğe Uygun</span></div>
+                            {% endif %}
+
+                            <p class="fw-bold mt-auto mb-0" style="color: var(--apple-dark); font-size: 1.1rem;">{{ paket.fiyat }} ₺</p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="p-4 bg-white rounded-4 shadow-sm text-muted text-center border">
+                        <p class="mb-0 fw-bold">Kayıtlı Bireysel abonelik paketiniz bulunmuyor.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 3. ANLIK SİPARİŞLER SEKMESİ (Değiştirilmedi) -->
+        <div class="tab-pane fade" id="pills-anlik" role="tabpanel">
+            <div class="apple-dash-card p-0 overflow-hidden">
+                <div class="p-4 border-bottom">
+                    <h5 class="fw-bold m-0 text-dark">Anlık Teslimat Siparişleri</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table apple-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Müşteri</th>
+                                <th>Paket</th>
+                                <th>Tutar</th>
+                                <th>Durum</th>
+                                <th class="text-end">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for siparis in anlik_siparisler %}
+                            <tr>
+                                <td class="text-muted fw-medium">#{{ siparis.id }}</td>
+                                <td class="fw-bold text-dark">{{ siparis.kullanici.username|default:"Silinmiş" }}</td>
+                                <td class="text-muted small">
+                                    {% for kalem in siparis.kalemler.all %}{{ kalem.paket_adi }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                </td>
+                                <td class="fw-bold">{{ siparis.toplam_tutar }} ₺</td>
+                                <td>
+                                    <span class="apple-badge
+                                        {% if siparis.durum == 'ODEME_BEKLIYOR' %}badge-warning
+                                        {% elif siparis.durum == 'ONAYLANDI' or siparis.durum == 'HAZIRLANIYOR' %}badge-info
+                                        {% elif siparis.durum == 'YOLDA' %}badge-primary
+                                        {% elif siparis.durum == 'TESLIM_EDILDI' %}badge-success
+                                        {% else %}badge-danger{% endif %}">
+                                        {{ siparis.get_durum_display }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light border rounded-pill px-3 fw-medium text-dark shadow-sm" type="button" data-bs-toggle="dropdown">
+                                            İşlem <i class="fas fa-chevron-down ms-1" style="font-size: 10px;"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end apple-dropdown-menu">
+                                            <li><form method="post" action="{% url 'siparis_durum_guncelle' siparis.id 'ONAYLANDI' %}">{% csrf_token %}<button class="dropdown-item apple-dropdown-item" style="color: var(--sys-blue);"><i class="fas fa-check me-2"></i>Onayla</button></form></li>
+                                            <li><form method="post" action="{% url 'siparis_durum_guncelle' siparis.id 'HAZIRLANIYOR' %}">{% csrf_token %}<button class="dropdown-item apple-dropdown-item" style="color: var(--sys-orange);"><i class="fas fa-cog me-2"></i>Hazırlanıyor</button></form></li>
+                                            <li><form method="post" action="{% url 'siparis_durum_guncelle' siparis.id 'YOLDA' %}">{% csrf_token %}<button class="dropdown-item apple-dropdown-item" style="color: var(--sys-teal);"><i class="fas fa-motorcycle me-2"></i>Yolda</button></form></li>
+                                            <li><form method="post" action="{% url 'siparis_durum_guncelle' siparis.id 'TESLIM_EDILDI' %}">{% csrf_token %}<button class="dropdown-item apple-dropdown-item" style="color: var(--sys-green);"><i class="fas fa-truck me-2"></i>Teslim Edildi</button></form></li>
+                                            <li><hr class="dropdown-divider mx-2"></li>
+                                            <li><form method="post" action="{% url 'siparis_durum_guncelle' siparis.id 'IPTAL' %}">{% csrf_token %}<button class="dropdown-item apple-dropdown-item" style="color: var(--sys-red);"><i class="fas fa-times me-2"></i>İptal Et</button></form></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="fas fa-motorcycle fa-3x mb-3" style="color: var(--apple-border);"></i>
+                                    <p class="mb-0 fw-medium text-muted">Henüz anlık teslimat siparişiniz bulunmuyor.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. TEKLİF RADARI SEKMESİ (Değiştirilmedi) -->
+        <div class="tab-pane fade" id="pills-radar" role="tabpanel">
+            <div class="apple-dash-card p-0 overflow-hidden">
+                <div class="p-4 border-bottom bg-danger bg-opacity-10 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold m-0 text-danger"><i class="fas fa-satellite-dish me-2"></i>Teklif Radarı</h5>
+                        <p class="small text-muted mb-0 mt-1">Firmanızın bulunduğu ({{ firma.sehir }}) bölgesi için genel müşteri talepleri.</p>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table apple-table">
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Müşteri</th>
+                                <th>Etkinlik & Kişi</th>
+                                <th>Öğün / Not</th>
+                                <th class="text-end">İletişim</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for teklif in hizli_teklifler %}
+                            <tr>
+                                <td class="text-muted fw-bold">{{ teklif.tarih|default:"Belirtilmedi" }}</td>
+                                <td class="fw-bold text-dark">{{ teklif.isim }}</td>
+                                <td>
+                                    <span class="d-block text-dark fw-medium">{{ teklif.etkinlik_turu }}</span>
+                                    <small class="text-muted"><i class="fas fa-users me-1"></i>{{ teklif.kisi_sayisi }} Kişi</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border rounded-pill mb-1">{{ teklif.ogun }}</span>
+                                    <p class="small text-muted mb-0" style="max-width: 250px;">{{ teklif.notlar|truncatechars:60 }}</p>
+                                </td>
+                                <td class="text-end">
+                                    <a href="tel:{{ teklif.telefon }}" class="btn btn-sm btn-dark rounded-pill px-3 fw-bold">
+                                        <i class="fas fa-phone-alt me-1"></i> {{ teklif.telefon }}
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <i class="fas fa-satellite-dish fa-3x mb-3 text-muted opacity-50"></i>
+                                    <h6 class="fw-bold text-muted">Bölgenizde henüz yeni bir fırsat bulunmuyor.</h6>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- SİSTEM LOGLARI (AUDIT TRAIL) EKRANI (Değiştirilmedi) -->
+<div class="apple-dash-card p-0 overflow-hidden mt-4 mb-5">
+    <div class="p-4 border-bottom bg-light">
+        <h6 class="fw-bold text-dark m-0"><i class="fas fa-history text-muted me-2"></i>Sistem İşlem Logları</h6>
+    </div>
+    <div class="apple-log-list bg-white">
+        {% for log in sistem_loglari %}
+        <div class="apple-log-item">
+            <span class="text-muted fw-bold me-2">{{ log.tarih|date:"d.m.Y H:i" }}</span> 
+            <span class="text-dark">{{ log.islem_detayi }}</span>
+        </div>
+        {% empty %}
+        <div class="apple-log-item text-muted text-center py-4">Henüz kaydedilmiş bir işlem logu bulunmuyor.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- ==========================================
+     PAKET EKLEME MODALI (APPLE STİLİ)
+     ========================================== -->
+<div class="modal fade" id="paketEkleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0" style="border-radius: 32px; box-shadow: 0 25px 50px rgba(0,0,0,0.15);">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="fw-bold text-dark" style="letter-spacing: -0.5px; font-size: 1.4rem;">Yeni Paket Oluştur</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form method="POST" enctype="multipart/form-data" class="apple-custom-form">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        {% for field in form %}
+                            <!-- Abonelik Checkbox Alanını Tam Genişlikte Göster -->
+                            {% if field.name == 'abonelik_uygun_mu' %}
+                                <div class="col-12 mt-3 mb-2">
+                                    <div class="d-flex align-items-center bg-light p-3 rounded-4 border border-success border-opacity-25">
+                                        {{ field }}
+                                        <div class="ms-3">
+                                            <label class="form-label text-success fw-bold mb-0 fs-6">{{ field.label }}</label>
+                                            <p class="small text-muted mb-0">Bu seçeneği işaretlerseniz, müşteriler bu paketi düzenli aralıklarla (20 günlük vs.) satın alabilir.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <!-- Diğer alanları yarım/tam genişlikte otomatik diz -->
+                                <div class="col-md-6 {% if field.name == 'aciklama' %}col-md-12{% endif %}">
+                                    <label class="form-label text-muted small fw-bold">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="text-danger small mt-1 fw-bold"><i class="fas fa-exclamation-circle"></i> {{ field.errors|striptags }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="btn btn-dark w-100 rounded-pill py-3 fw-bold mt-4" style="font-size: 1.1rem;">
+                        Paketi Yayına Al <i class="fas fa-rocket ms-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KANBAN SÜRÜKLE BIRAK JAVASCRIPT -->
+<script>
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.dataset.id); }
+
+    function drop(ev, yeniDurum) {
+        ev.preventDefault();
+        var siparisId = ev.dataTransfer.getData("text");
+        var cardElement = document.getElementById("siparis-" + siparisId);
+        
+        var targetColumn = ev.currentTarget.querySelector('.kanban-cards');
+        targetColumn.appendChild(cardElement);
+
+        fetch("{% url 'siparis_durum_guncelle_api' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: "siparis_id=" + siparisId + "&durum=" + yeniDurum
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status !== 'success') {
+                alert("Durum güncellenirken bir hata oluştu!");
+                location.reload(); 
+            }
+        });
+    }
+</script>
+
+{% endblock %}

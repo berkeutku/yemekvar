@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* APPLE GLOBAL RENKLER & TİPOGRAFİ */
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-text-gray: #86868b;
+        --apple-border: #d2d2d7;
+    }
+
+    body { background-color: var(--apple-light-bg); }
+    h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.04em; }
+
+    /* APPLE ROZET */
+    .apple-badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 50px;
+        background: rgba(0, 113, 227, 0.08);
+        color: var(--apple-blue);
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    /* APPLE HERO BAŞLIK */
+    .apple-hero-title {
+        font-size: clamp(2.8rem, 5vw, 4.2rem);
+        font-weight: 800;
+        color: var(--apple-dark);
+        line-height: 1.05;
+        letter-spacing: -2px;
+    }
+
+    /* APPLE BUTONLAR */
+    .btn-apple-primary {
+        background: var(--apple-blue);
+        color: #fff !important;
+        border-radius: 50px;
+        padding: 14px 28px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: 0.3s;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+    .btn-apple-primary:hover {
+        background: var(--apple-blue-hover);
+        transform: scale(1.02);
+        box-shadow: 0 6px 20px rgba(0, 113, 227, 0.2);
+    }
+
+    .btn-apple-secondary {
+        background: #e8e8ed;
+        color: var(--apple-dark) !important;
+        border-radius: 50px;
+        padding: 14px 28px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: 0.3s;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+    .btn-apple-secondary:hover { background: #d2d2d7; }
+
+    /* APPLE HERO GÖRSEL & YÜZEN WIDGET */
+    .apple-hero-img-wrapper {
+        position: relative;
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+        transform: translateZ(0);
+    }
+    .apple-hero-img {
+        width: 100%;
+        height: 550px;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    .apple-hero-img-wrapper:hover .apple-hero-img { transform: scale(1.03); }
+
+    /* iOS Tarzı Yüzen Widget (Glassmorphism) */
+    .apple-glass-widget {
+        position: absolute;
+        bottom: 30px;
+        left: -20px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: saturate(180%) blur(20px);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 24px;
+        padding: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        z-index: 2;
+        animation: floatY 4s ease-in-out infinite;
+        text-align: center;
+        min-width: 160px;
+    }
+    .apple-glass-icon {
+        width: 48px;
+        height: 48px;
+        background: var(--apple-blue);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin: 0 auto 10px;
+    }
+
+    @keyframes floatY {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-12px); }
+        100% { transform: translateY(0); }
+    }
+
+    /* İSTATİSTİKLER */
+    .apple-stats-section {
+        background: #ffffff;
+        border-top: 1px solid rgba(0,0,0,0.03);
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+    }
+    .apple-stat-number {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: var(--apple-dark);
+        letter-spacing: -2px;
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+
+    /* BENTO ÖZELLİK KARTLARI */
+    .apple-feature-card {
+        background: #ffffff;
+        border-radius: 32px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        border: 1px solid rgba(0,0,0,0.02);
+        transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .apple-feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+    }
+    .apple-feature-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(0, 113, 227, 0.05);
+        color: var(--apple-blue);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 24px;
+    }
+
+    @media (max-width: 991px) {
+        .apple-glass-widget { left: 20px; }
+        .apple-hero-img { height: 400px; }
+    }
+</style>
+
+<!-- 1. HERO (KARŞILAMA) ALANI -->
+<div class="container py-5 mt-4">
+    <div class="row align-items-center">
+        <!-- Sol Metin Alanı -->
+        <div class="col-lg-6 mb-5 mb-lg-0 pe-lg-5">
+            <span class="apple-badge mb-3">
+                <i class="fas fa-star me-2"></i> PREMİUM CATERING AĞI
+            </span>
+            
+            <h1 class="apple-hero-title mb-4">
+                Kurumsal İkramlarda <br><span style="color: var(--apple-blue);">Yeni Nesil</span> Standart.
+            </h1>
+            
+            <p class="text-muted mb-4" style="font-size: 1.25rem; line-height: 1.5; color: var(--apple-text-gray) !important;">
+                <strong class="text-dark">YemekVar</strong>, kurumsal etkinlikleriniz ve özel davetleriniz için Türkiye'nin en seçkin catering firmalarını tek bir çatı altında toplayan premium bir pazar yeridir.
+            </p>
+            <p class="text-secondary mb-5" style="font-size: 1.05rem; line-height: 1.6;">
+                Operasyonel süreçleri dijitalleştirerek, menü seçiminden teslimata kadar kusursuz, şeffaf ve %100 güvenilir bir organizasyon deneyimi sunuyoruz.
+            </p>
+            
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{% url 'firmalar' %}" class="btn-apple-primary">
+                    İş Ortaklarımızı Keşfedin <i class="fas fa-arrow-right ms-2" style="font-size: 14px;"></i>
+                </a>
+                <a href="{% url 'iletisim' %}" class="btn-apple-secondary">
+                    Bize Ulaşın
+                </a>
+            </div>
+        </div>
+        
+        <!-- Sağ Görsel Alanı -->
+        <div class="col-lg-6 ps-lg-4">
+            <div class="position-relative">
+                <div class="apple-hero-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1555244162-803834f70033?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="YemekVar Kurumsal" class="apple-hero-img">
+                </div>
+                
+                <!-- iOS Tarzı Yüzen Widget -->
+                <div class="apple-glass-widget d-none d-md-block">
+                    <div class="apple-glass-icon">
+                        <i class="fas fa-shield-check"></i>
+                    </div>
+                    <h3 class="text-dark fw-bold mb-0" style="letter-spacing: -1px; font-size: 1.5rem;">%100</h3>
+                    <p class="mb-0 fw-medium" style="color: var(--apple-text-gray); font-size: 0.85rem;">Güvenli Hizmet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. İSTATİSTİKLER & GÜVEN ALANI -->
+<div class="apple-stats-section py-5 mt-4">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-4">
+                <h2 class="apple-stat-number">50+</h2>
+                <p class="mb-0 fw-bold" style="color: var(--apple-text-gray); font-size: 1.1rem;">Seçkin Catering Firması</p>
+            </div>
+            <div class="col-md-4">
+                <h2 class="apple-stat-number">10K+</h2>
+                <p class="mb-0 fw-bold" style="color: var(--apple-text-gray); font-size: 1.1rem;">Mutlu Misafir</p>
+            </div>
+            <div class="col-md-4">
+                <h2 class="apple-stat-number">7/24</h2>
+                <p class="mb-0 fw-bold" style="color: var(--apple-text-gray); font-size: 1.1rem;">Kurumsal Destek</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3. NEDEN BİZ? ALANI (APPLE BENTO KARTLARI) -->
+<div class="container py-5 mt-5 mb-5">
+    <div class="text-center mb-5 pb-3">
+        <h2 class="fw-bold text-dark" style="font-size: 2.5rem; letter-spacing: -1px;">Neden YemekVar'ı Seçmelisiniz?</h2>
+        <p style="color: var(--apple-text-gray); font-size: 1.1rem;">Ayrıcalıklı bir organizasyon deneyimi için her detayı düşündük.</p>
+    </div>
+    
+    <div class="row g-4">
+        <!-- Kart 1 -->
+        <div class="col-md-4">
+            <div class="apple-feature-card">
+                <div class="apple-feature-icon">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-3" style="letter-spacing: -0.5px;">Premium Standartlar</h4>
+                <p class="mb-0" style="color: var(--apple-text-gray); line-height: 1.6;">Platformumuzdaki tüm firmalar katı hijyen, lezzet ve sunum denetimlerinden geçerek sisteme dahil edilir.</p>
+            </div>
+        </div>
+        
+        <!-- Kart 2 -->
+        <div class="col-md-4">
+            <div class="apple-feature-card">
+                <div class="apple-feature-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-3" style="letter-spacing: -0.5px;">Şeffaf Fiyatlandırma</h4>
+                <p class="mb-0" style="color: var(--apple-text-gray); line-height: 1.6;">Sürpriz maliyetler olmadan, firmaların tekliflerini karşılaştırabilir ve bütçenize en uygun seçimi yapabilirsiniz.</p>
+            </div>
+        </div>
+        
+        <!-- Kart 3 -->
+        <div class="col-md-4">
+            <div class="apple-feature-card">
+                <div class="apple-feature-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-3" style="letter-spacing: -0.5px;">Kesintisiz Destek</h4>
+                <p class="mb-0" style="color: var(--apple-text-gray); line-height: 1.6;">Organizasyonunuzun başından sonuna kadar dedike edilmiş destek ekibimizle her zaman yanınızdayız.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

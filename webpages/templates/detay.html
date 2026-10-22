@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* APPLE GLOBAL RENKLER & TİPOGRAFİ */
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-text-gray: #86868b;
+        --apple-border: #d2d2d7;
+    }
+
+    body { background-color: var(--apple-light-bg); }
+    h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.04em; }
+
+    /* GERİ DÖN LİNKİ */
+    .apple-back-link {
+        color: var(--apple-blue);
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 15px;
+        transition: 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .apple-back-link:hover {
+        color: var(--apple-blue-hover);
+        transform: translateX(-4px);
+    }
+
+    /* APPLE KART (BENTO STİLİ) */
+    .apple-card {
+        background: #ffffff;
+        border-radius: 24px;
+        border: none;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+        transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+    .apple-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    }
+
+    .apple-price {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--apple-dark);
+        letter-spacing: -1px;
+    }
+
+    /* APPLE BUTON AİLESİ */
+    .btn-apple-primary {
+        background: var(--apple-blue);
+        color: #fff !important;
+        border-radius: 50px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: 0.3s;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+    .btn-apple-primary:hover { background: var(--apple-blue-hover); transform: scale(1.02); }
+
+    .btn-apple-secondary {
+        background: var(--apple-light-bg);
+        color: var(--apple-dark) !important;
+        border-radius: 50px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: 0.3s;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+    .btn-apple-secondary:hover { background: #e8e8ed; }
+
+    /* ROZETLER */
+    .apple-badge-warning {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 50px;
+        background: #fdf6e3;
+        color: #d97706;
+        border: 1px solid rgba(217, 119, 6, 0.2);
+        display: inline-flex;
+        align-items: center;
+    }
+
+    /* BOŞ DURUM (EMPTY STATE) */
+    .apple-empty-state {
+        background: #fff;
+        border-radius: 28px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        padding: 80px 20px;
+        text-align: center;
+    }
+</style>
+
+<div class="container py-5 mt-2 mb-5">
+    
+    <!-- BAŞLIK VE GERİ DÖN BÖLÜMÜ -->
+    <div class="mb-5">
+        <a href="{% url 'home' %}" class="apple-back-link mb-3">
+            <i class="fas fa-chevron-left" style="font-size: 12px;"></i> Ana Sayfaya Dön
+        </a>
+        <h1 class="fw-bold text-dark m-0" style="font-size: clamp(2.5rem, 5vw, 3.5rem); letter-spacing: -2px;">
+            {{ hizmet.emoji }} {{ hizmet.baslik }} <span style="color: var(--apple-text-gray);">Paketleri.</span>
+        </h1>
+    </div>
+    
+    <div class="row g-4">
+        <!-- DJANGO DÖNGÜSÜ (HİÇBİR ŞEY DEĞİŞTİRİLMEDİ) -->
+        {% for paket in hizmet.paketler.all %}
+        <div class="col-md-4">
+            <div class="card apple-card h-100 d-flex flex-column">
+                
+                {% if paket.resim %}
+                <img src="{{ paket.resim.url }}" class="card-img-top" alt="{{ paket.isim }}" style="height: 220px; object-fit: cover;">
+                {% endif %}
+                
+                <div class="card-body d-flex flex-column p-4">
+                    
+                    <!-- FİRMA İSMİ VE PUAN -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary fw-bold" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="fas fa-store me-1"></i> {{ paket.firma.isim|default:"Firma Bilgisi Yok" }}
+                        </span>
+                        
+                        <span class="badge bg-light text-dark rounded-pill shadow-sm">
+                            <i class="fas fa-star text-warning"></i> {{ paket.firma.puan|default:"Yeni" }}
+                        </span>
+                    </div>
+                    
+                    <!-- PAKET İSMİ -->
+                    <h4 class="fw-bold text-dark mb-2" style="letter-spacing: -1px;">{{ paket.isim }}</h4>
+                    
+                    <!-- SÜPER ESNAF ROZETİ -->
+                    {% if paket.firma.super_esnaf %}
+                    <div class="mb-3">
+                        <span class="apple-badge-warning" title="Yüksek Müşteri Memnuniyeti">
+                            <i class="fas fa-crown me-1"></i> Süper Esnaf
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- AÇIKLAMA -->
+                    <p class="text-muted small flex-grow-1" style="font-size: 15px; line-height: 1.5;">{{ paket.aciklama }}</p>
+                    
+                    <!-- FİYAT -->
+                    <h3 class="apple-price mb-4">{{ paket.fiyat }} ₺</h3>
+                    
+                    <!-- İŞLEVSEL BUTONLAR (HİÇBİR LİNK DEĞİŞTİRİLMEDİ) -->
+                    <div class="mt-auto d-flex flex-column gap-2 border-top pt-4">
+                        
+                        <!-- İncele Butonu -->
+                        <a href="{% url 'teklif_al' paket.slug %}" class="btn-apple-secondary w-100">
+                            İncele / Teklif Al
+                        </a>
+                        
+                        <div class="d-flex gap-2">
+                            <!-- Sepete Ekle Butonu -->
+                            <a href="{% url 'sepete_ekle' paket.slug %}" class="btn-apple-primary flex-grow-1">
+                                <i class="fas fa-shopping-cart me-2"></i> Sepete Ekle
+                            </a>
+                            
+                            <!-- Karşılaştır Butonu -->
+                            <a href="{% url 'karsilastirmaya_ekle' paket.slug %}" class="btn-apple-secondary px-3" title="Karşılaştır">
+                                <i class="fas fa-balance-scale"></i>
+                            </a>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% empty %}
+        <!-- BOŞ DURUM (EMPTY STATE) -->
+        <div class="col-12">
+            <div class="apple-empty-state">
+                <div class="mb-4">
+                    <i class="fas fa-box-open" style="font-size: 4rem; color: var(--apple-border);"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-3" style="font-size: 2rem; letter-spacing: -1px;">Henüz Paket Yok</h4>
+                <p class="text-muted fs-6">Bu kategoriye ait henüz bir paket bulunmuyor. Lütfen daha sonra tekrar kontrol edin.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

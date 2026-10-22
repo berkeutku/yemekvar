@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* APPLE GLOBAL RENKLER & TİPOGRAFİ */
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-text-gray: #86868b;
+        --apple-border: #d2d2d7;
+    }
+
+    body { background-color: var(--apple-light-bg); }
+    h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.04em; }
+
+    /* APPLE BENTO KARTLARI */
+    .apple-order-card {
+        background: #ffffff;
+        border-radius: 28px;
+        padding: 30px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        border: 1px solid rgba(0,0,0,0.02);
+    }
+    
+    .apple-package-card {
+        background: #ffffff;
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    /* APPLE FİYAT PANOSU (Glassmorphism + Koyu Tema) */
+    .apple-price-dashboard {
+        background: rgba(29, 29, 31, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 30px;
+        color: #ffffff;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    .apple-price-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        font-size: 0.9rem;
+    }
+    .apple-price-row:last-child { border-bottom: none; }
+    .apple-price-label { color: rgba(255,255,255,0.7); }
+    .apple-price-value { font-weight: 600; letter-spacing: 0.5px; }
+
+    .apple-total-price {
+        font-size: 2.2rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-top: 10px;
+    }
+
+    /* APPLE FORM ELEMANLARI */
+    .apple-form-label {
+        font-size: 0.8rem;
+        color: var(--apple-text-gray);
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .apple-input {
+        background-color: var(--apple-light-bg);
+        border: 1px solid transparent;
+        border-radius: 14px;
+        color: var(--apple-dark);
+        font-weight: 500;
+        font-size: 0.95rem;
+        padding: 14px 16px;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    .apple-input:focus {
+        background-color: #ffffff;
+        border-color: var(--apple-blue);
+        box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+        outline: none;
+    }
+    .apple-input::placeholder { color: #a1a1a6; font-weight: 400; }
+
+    /* BUTON */
+    .btn-apple-primary {
+        background: var(--apple-blue);
+        color: #fff !important;
+        border-radius: 50px;
+        padding: 16px 24px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: 0.3s;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        text-decoration: none;
+    }
+    .btn-apple-primary:hover {
+        background: var(--apple-blue-hover);
+        transform: scale(1.02);
+        box-shadow: 0 6px 20px rgba(0, 113, 227, 0.2);
+    }
+
+    /* DEĞERLENDİRME KARTLARI */
+    .apple-review-card {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 24px;
+        border: 1px solid rgba(0,0,0,0.03);
+    }
+    .apple-review-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: rgba(0, 113, 227, 0.08);
+        color: var(--apple-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+</style>
+
+<div class="container py-5 mt-4 mb-5">
+    
+    <!-- Geri Dön Linki -->
+    <div class="mb-4">
+        <a href="javascript:history.back()" class="text-decoration-none fw-bold" style="color: var(--apple-blue); font-size: 15px;">
+            <i class="fas fa-chevron-left me-1" style="font-size: 12px;"></i> Geri Dön
+        </a>
+    </div>
+
+    <div class="row justify-content-center g-4">
+        
+        <!-- Sol Kolon: Paket Özeti ve Fiyat Panosu -->
+        <div class="col-lg-5 mb-4">
+            
+            <!-- Paket Bilgisi Kartı -->
+            <div class="apple-package-card mb-4">
+                {% if paket.resim %}
+                <img src="{{ paket.resim.url }}" alt="{{ paket.isim }}" style="width: 100%; height: 220px; object-fit: cover;">
+                {% endif %}
+                <div class="p-4">
+                    {% if paket.firma %}
+                    <div class="mb-2 d-flex align-items-center" style="font-size: 0.85rem;">
+                        <span class="fw-bold" style="color: var(--apple-blue);"><i class="fas fa-store me-1"></i> {{ paket.firma.isim }}</span> 
+                        <span class="ms-2" style="color: #f59e0b;"><i class="fas fa-star"></i> {{ paket.firma.puan }}</span>
+                    </div>
+                    {% endif %}
+                    <h3 class="text-dark fw-bold mb-2" style="letter-spacing: -0.5px;">{{ paket.isim }}</h3>
+                    <p class="text-muted small mb-0" style="line-height: 1.6; color: var(--apple-text-gray) !important;">{{ paket.aciklama }}</p>
+                </div>
+            </div>
+
+            <!-- Dinamik Fiyat Göstergesi Kartı (Apple Pro Stil) -->
+            <div class="apple-price-dashboard">
+                <h5 class="fw-bold mb-4 border-bottom pb-3" style="border-color: rgba(255,255,255,0.1) !important; letter-spacing: -0.5px;">
+                    <i class="fas fa-calculator me-2" style="color: var(--apple-blue);"></i> Fiyat Hesaplaması
+                </h5>
+                
+                <div class="apple-price-row">
+                    <span class="apple-price-label">Tavan Birim Fiyat (Tekil)</span>
+                    <span class="apple-price-value" id="tavan_fiyat">0.00 ₺</span>
+                </div>
+                
+                <div class="apple-price-row">
+                    <span class="apple-price-label">Taban Birim Fiyat (Max İskonto)</span>
+                    <span class="apple-price-value" id="taban_fiyat">0.00 ₺</span>
+                </div>
+                
+                <div class="apple-price-row" style="background: rgba(0, 113, 227, 0.15); padding: 12px 16px; border-radius: 12px; margin-top: 10px; border: none;">
+                    <span class="fw-medium text-white">Kişi Başı Güncel Fiyat</span>
+                    <span class="fw-bold fs-5 text-white" id="guncel_birim_fiyat">0.00 ₺</span>
+                </div>
+                
+                <div class="mt-4 pt-3 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+                    <span class="apple-price-label d-block mb-1">Toplam Tutar</span>
+                    <div class="apple-total-price" id="toplam_fiyat_gosterge">0.00 ₺</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ Kolon: Form Alanı -->
+        <div class="col-lg-7">
+            <div class="apple-order-card h-100">
+                <h3 class="fw-bold text-dark mb-4 border-bottom pb-3" style="letter-spacing: -1px;">Talep Bilgileri</h3>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    <!-- Javascript'in hesapladığı toplam fiyat buraya aktarılır -->
+                    <input type="hidden" name="toplam_fiyat" id="toplam_fiyat_input">
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="apple-form-label">Adınız Soyadınız</label>
+                            <input type="text" name="isim" class="form-control apple-input" required placeholder="Örn: Ahmet Yılmaz">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="apple-form-label">Telefon Numaranız</label>
+                            <input type="text" name="telefon" class="form-control apple-input" required placeholder="05XX XXX XX XX">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="apple-form-label">Kişi Sayısı</label>
+                            <input type="number" id="kisi_sayisi" name="kisi_sayisi" class="form-control apple-input fw-bold" style="color: var(--apple-blue);" value="{{ paket.min_kisi_sayisi }}" min="{{ paket.min_kisi_sayisi }}" required>
+                            <div class="form-text mt-2 small" style="color: var(--apple-text-gray);">
+                                <i class="fas fa-info-circle me-1" style="color: var(--apple-blue);"></i> Kişi sayısı arttıkça kişi başı birim fiyat düşer. En az {{ paket.min_kisi_sayisi }} kişi girilmelidir.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="apple-form-label">Başlangıç Tarihi</label>
+                            <input type="date" name="baslangic_tarihi" class="form-control apple-input" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="apple-form-label">Bitiş Tarihi (İsteğe Bağlı)</label>
+                            <input type="date" name="bitis_tarihi" class="form-control apple-input">
+                            <div class="form-text mt-1 small" style="color: var(--apple-text-gray);">Tek günlük ise boş bırakın.</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="apple-form-label">Teslimat Adresi & Notlar</label>
+                            <textarea name="adres" class="form-control apple-input" rows="3" required placeholder="Teslimat adresi ve ek notlarınızı giriniz..."></textarea>
+                        </div>
+
+                        <div class="col-12 mt-4 pt-2">
+                            <button type="submit" class="btn-apple-primary">
+                                Talebi Firmaya İlet <i class="fas fa-paper-plane ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- Müşteri Değerlendirmeleri Bölümü -->
+    <div class="row mt-5 pt-5 border-top" style="border-color: rgba(0,0,0,0.05) !important;">
+        <div class="col-12">
+            <h3 class="fw-bold text-dark mb-4" style="letter-spacing: -1px;">Müşteri Değerlendirmeleri</h3>
+            
+            {% if paket.yorumlar.all %}
+                <div class="row g-4">
+                    {% for yorum in paket.yorumlar.all %}
+                    <div class="col-md-6">
+                        <div class="apple-review-card h-100 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="apple-review-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <span class="fw-bold text-dark">{{ yorum.kullanici.username }}</span>
+                                </div>
+                                <span style="color: #f59e0b; font-size: 0.9rem; letter-spacing: 1px;">
+                                    {% if yorum.puan == 5 %}⭐⭐⭐⭐⭐
+                                    {% elif yorum.puan == 4 %}⭐⭐⭐⭐
+                                    {% elif yorum.puan == 3 %}⭐⭐⭐
+                                    {% elif yorum.puan == 2 %}⭐⭐
+                                    {% elif yorum.puan == 1 %}⭐
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <p class="text-secondary small mb-3 fst-italic flex-grow-1" style="color: var(--apple-dark) !important; line-height: 1.5;">"{{ yorum.yorum_metni }}"</p>
+                            <small class="mt-auto" style="color: var(--apple-text-gray);"><i class="far fa-calendar-alt me-1"></i> {{ yorum.olusturulma_tarihi|date:"d.m.Y" }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5" style="background: #ffffff; border-radius: 24px; border: 1px solid rgba(0,0,0,0.03);">
+                    <i class="fas fa-comment-slash fa-2x mb-3" style="color: var(--apple-border);"></i>
+                    <p class="text-muted mb-0 fw-medium">Bu hizmet için henüz bir değerlendirme yapılmamış.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- DİNAMİK FİYAT HESAPLAMA JAVASCRIPT KODLARI (KORUNDU) -->
+<script>
+    const basePrice = parseFloat("{{ paket.fiyat|stringformat:'f' }}");
+    const minPeople = parseInt("{{ paket.min_kisi_sayisi }}");
+    const discountRate = parseInt("{{ paket.max_iskonto_orani|default:0 }}") / 100; 
+    
+    const inputKisi = document.getElementById("kisi_sayisi");
+    const tavanFiyatEl = document.getElementById("tavan_fiyat");
+    const tabanFiyatEl = document.getElementById("taban_fiyat");
+    const guncelBirimFiyatEl = document.getElementById("guncel_birim_fiyat");
+    const toplamFiyatGosterge = document.getElementById("toplam_fiyat_gosterge");
+    const hiddenToplamInput = document.getElementById("toplam_fiyat_input");
+
+    function fiyatHesapla() {
+        let N = parseInt(inputKisi.value);
+        if (isNaN(N) || N < minPeople) {
+            N = minPeople;
+        }
+
+        const tavan = basePrice;
+        const taban = basePrice * (1 - discountRate); 
+
+        const guncelBirim = basePrice * ((1 - discountRate) + discountRate * (minPeople / N));
+        const toplam = guncelBirim * N;
+
+        tavanFiyatEl.innerText = tavan.toFixed(2) + " ₺";
+        tabanFiyatEl.innerText = taban.toFixed(2) + " ₺";
+        guncelBirimFiyatEl.innerText = guncelBirim.toFixed(2) + " ₺";
+        toplamFiyatGosterge.innerText = toplam.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ₺";
+        
+        hiddenToplamInput.value = toplam.toFixed(2);
+    }
+
+    inputKisi.addEventListener("input", fiyatHesapla);
+    window.onload = fiyatHesapla;
+</script>
+{% endblock %}

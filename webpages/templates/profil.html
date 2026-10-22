@@ -1,0 +1,414 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* APPLE GLOBAL RENKLER & TİPOGRAFİ */
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-text-gray: #86868b;
+        --apple-border: #d2d2d7;
+    }
+
+    body { background-color: var(--apple-light-bg); }
+    h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.04em; }
+
+    /* APPLE BENTO KARTLARI */
+    .apple-dash-card {
+        background: #ffffff;
+        border-radius: 28px;
+        border: 1px solid rgba(0,0,0,0.02);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    /* APPLE TABLO STİLİ */
+    .apple-table { width: 100%; margin-bottom: 0; }
+    .apple-table th {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--apple-text-gray);
+        font-weight: 600;
+        border-bottom: 1px solid var(--apple-border);
+        padding: 16px 12px;
+        background: transparent !important;
+    }
+    .apple-table td {
+        padding: 16px 12px;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(0,0,0,0.04);
+        font-size: 0.95rem;
+        color: var(--apple-dark);
+    }
+    .apple-table tbody tr { transition: background-color 0.2s; }
+    .apple-table tbody tr:hover { background-color: #fafafa; }
+
+    /* APPLE ROZETLER */
+    .apple-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+    }
+    .badge-completed { background: rgba(52, 199, 89, 0.1); color: #248a3d; border: 1px solid rgba(52, 199, 89, 0.2); }
+    .badge-pending { background: var(--apple-light-bg); color: var(--apple-dark); border: 1px solid var(--apple-border); }
+    .badge-revize { background: rgba(255, 159, 10, 0.1); color: #b26c00; border: 1px solid rgba(255, 159, 10, 0.2); }
+    .badge-active-sub { background: rgba(0, 113, 227, 0.1); color: var(--apple-blue); border: 1px solid rgba(0, 113, 227, 0.2); }
+    
+    .ext-badge { font-size: 0.7rem; background: #e8e8ed; color: var(--apple-dark); padding: 4px 8px; border-radius: 6px; font-weight: 600; display: inline-block; margin-top: 4px; margin-right: 4px; border: 1px solid #d2d2d7;}
+    .ext-badge-hot { background: rgba(255, 59, 48, 0.1); color: #ff3b30; border-color: rgba(255, 59, 48, 0.2); }
+    .ext-badge-cold { background: rgba(50, 173, 230, 0.1); color: #0077ed; border-color: rgba(50, 173, 230, 0.2); }
+
+    /* APPLE BUTONLAR */
+    .btn-apple-primary {
+        background: var(--apple-blue);
+        color: #fff !important;
+        border-radius: 50px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: 0.3s;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+    .btn-apple-primary:hover {
+        background: var(--apple-blue-hover);
+        transform: scale(1.02);
+        box-shadow: 0 4px 15px rgba(0, 113, 227, 0.2);
+    }
+
+    .btn-apple-outline {
+        background: transparent;
+        color: var(--apple-blue);
+        border: 1px solid var(--apple-blue);
+        border-radius: 50px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn-apple-outline:hover {
+        background: var(--apple-blue);
+        color: #fff;
+    }
+
+    .btn-apple-skip {
+        background: transparent;
+        color: var(--apple-text-gray);
+        border: 1px solid var(--apple-border);
+        border-radius: 50px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn-apple-skip:hover {
+        background: var(--apple-light-bg);
+        color: var(--apple-dark);
+        border-color: var(--apple-text-gray);
+    }
+
+    /* YENİ: PAZARLIK (REVİZE) UYARI KUTUSU VE BUTONLARI */
+    .revize-alert {
+        background: linear-gradient(145deg, #1d1d1f, #333336);
+        color: white;
+        border-radius: 18px;
+        padding: 20px 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        margin: 10px 0;
+    }
+    .btn-apple-success { background: #34c759; color: white; border: none; border-radius: 50px; padding: 8px 20px; font-weight: 600; transition: 0.2s; font-size: 0.9rem;}
+    .btn-apple-success:hover { background: #2ebd4e; transform: scale(1.02); }
+    .btn-apple-danger { background: rgba(255, 59, 48, 0.15); color: #ff3b30; border: none; border-radius: 50px; padding: 8px 20px; font-weight: 600; transition: 0.2s; font-size: 0.9rem;}
+    .btn-apple-danger:hover { background: rgba(255, 59, 48, 0.25); transform: scale(1.02); }
+
+    /* İNTERAKTİF YILDIZ PUANLAMA SİSTEMİ */
+    .rating-css { display: flex; flex-direction: row-reverse; justify-content: center; }
+    .rating-css input { display: none; }
+    .rating-css label { font-size: 2.2rem; color: var(--apple-border); cursor: pointer; transition: 0.2s; margin: 0 4px; }
+    .rating-css input:checked ~ label, .rating-css label:hover, .rating-css label:hover ~ label { color: #f59e0b; }
+
+    /* MODAL ÖZELLEŞTİRME */
+    .apple-modal-content { border-radius: 28px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.15); padding: 20px; }
+    
+    /* ABONELİK İLERLEME ÇUBUĞU */
+    .apple-progress-wrapper { width: 100%; background-color: var(--apple-border); border-radius: 50px; height: 6px; margin-top: 8px; overflow: hidden; }
+    .apple-progress-bar { background-color: var(--apple-blue); height: 100%; border-radius: 50px; transition: width 0.5s ease; }
+</style>
+
+<div class="container py-5 mt-4 mb-5">
+    
+    <!-- Başlık ve Çıkış Yap Butonu -->
+    <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom" style="border-color: var(--apple-border) !important;">
+        <h1 class="fw-bold text-dark m-0" style="font-size: clamp(2rem, 4vw, 2.5rem); letter-spacing: -1px;">
+            <i class="far fa-user-circle me-2" style="color: var(--apple-blue);"></i>Profilim ve Taleplerim
+        </h1>
+        
+        <form method="post" action="{% url 'cikis_yap' %}" class="d-inline m-0">
+            {% csrf_token %}
+            <button type="submit" class="btn-apple-outline">
+                Çıkış Yap <i class="fas fa-sign-out-alt ms-2"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- 1. CATERING TALEPLERİ VE DEĞERLENDİRME MODÜLÜ -->
+    <div class="apple-dash-card">
+        <h3 class="fw-bold text-dark mb-4" style="font-size: 1.3rem; letter-spacing: -0.5px;">Catering ve Aboneliklerim</h3>
+        <div class="table-responsive">
+            <table class="table apple-table">
+                <thead>
+                    <tr>
+                        <th>Paket Detayı</th>
+                        <th>Etkinlik/Başlangıç</th>
+                        <th>Kişi</th>
+                        <th>Durum</th>
+                        <th class="text-end">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for talep in catering_talepleri %}
+                    <!-- Eğer durum revize ise altındaki çizgi kalkar ki kutuyla birleşsin -->
+                    <tr {% if talep.durum == 'Revize Edildi' %}style="border-bottom: none;"{% endif %}>
+                        <td class="text-dark">
+                            <span class="fw-bold fs-6 d-block">{{ talep.paket.isim|default:"Silinmiş" }}</span>
+                            
+                            <!-- BİREYSEL ABONELİK DETAYLARI -->
+                            {% if talep.abonelik_suresi %}
+                                <span class="ext-badge"><i class="fas fa-sync-alt text-primary me-1"></i>{{ talep.abonelik_suresi }} Gün Abonelik</span>
+                                
+                                {% if talep.teslimat_sekli == 'Sıcak' %}
+                                    <span class="ext-badge ext-badge-hot"><i class="fas fa-fire me-1"></i>Sıcak Teslim</span>
+                                {% elif talep.teslimat_sekli == 'Soğuk' %}
+                                    <span class="ext-badge ext-badge-cold"><i class="fas fa-snowflake me-1"></i>Soğuk Teslim</span>
+                                {% endif %}
+                                
+                                {% if talep.durum == 'Tamamlandı' or talep.durum == 'Aktif' or talep.kalan_abonelik_gunu %}
+                                    <div class="mt-2" style="max-width: 200px;">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span style="font-size: 0.75rem; color: var(--apple-text-gray); font-weight: 600;">Kalan Gün: <strong class="text-dark">{{ talep.kalan_abonelik_gunu|default:talep.abonelik_suresi }}</strong></span>
+                                        </div>
+                                        <div class="apple-progress-wrapper">
+                                            <!-- Örnek hesaplama, backendden yüzdelik geliyorsa o değişkeni yazın -->
+                                            <div class="apple-progress-bar" style="width: 65%;"></div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if talep.secilen_ek_hizmetler.all %}
+                                {% for ek in talep.secilen_ek_hizmetler.all %}
+                                    <span class="ext-badge"><i class="fas fa-plus text-success me-1"></i>{{ ek.isim }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                        <td style="color: var(--apple-text-gray);">{{ talep.etkinlik_tarihi|date:"d.m.Y"|default:"-" }}</td>
+                        <td style="color: var(--apple-text-gray);">{{ talep.kisi_sayisi }} Kişi</td>
+                        <td>
+                            <!-- Dinamik Rozet Renkleri -->
+                            <span class="apple-badge {% if talep.durum == 'Tamamlandı' %}badge-completed{% elif talep.durum == 'Revize Edildi' %}badge-revize{% elif talep.durum == 'Aktif' %}badge-active-sub{% else %}badge-pending{% endif %}">
+                                {% if talep.durum == 'Revize Edildi' %}Cevap Bekliyor{% else %}{{ talep.durum }}{% endif %}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <!-- AKTİF ABONELİK İŞLEMLERİ (GÜNÜ ATLA) -->
+                            {% if talep.abonelik_suresi and talep.durum == 'Aktif' %}
+                                <button type="button" class="btn-apple-skip mb-2 w-100" data-bs-toggle="modal" data-bs-target="#gunAtlaModal{{ talep.id }}">
+                                    <i class="fas fa-calendar-times me-1"></i> Günü Atla
+                                </button>
+
+                                <!-- Günü Atla Modal -->
+                                <div class="modal fade text-start" id="gunAtlaModal{{ talep.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content apple-modal-content">
+                                            <div class="modal-header border-0 pb-0 pt-3 px-3">
+                                                <h5 class="modal-title fw-bold text-dark" style="letter-spacing: -0.5px;">Teslimatı Ertele</h5>
+                                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                            </div>
+                                            <form action="{% url 'abonelik_gun_atla' talep.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <div class="modal-body text-center p-4">
+                                                    <div class="mb-3"><i class="fas fa-calendar-day fa-3x" style="color: var(--apple-text-gray);"></i></div>
+                                                    <p class="mb-3" style="color: var(--apple-text-gray); font-size: 0.95rem;">Yarın için teslimat almak istemiyorsanız bu işlemi yapabilirsiniz. Ertelenen gün, abonelik sürenizin sonuna eklenecektir.</p>
+                                                </div>
+                                                <div class="modal-footer border-0 pt-0 px-3 pb-3">
+                                                    <button type="submit" class="btn-apple-primary w-100 py-3 bg-dark">Teslimatı Ertele <i class="fas fa-arrow-right ms-2" style="font-size: 13px;"></i></button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- TAMAMLANAN SİPARİŞ DEĞERLENDİRMESİ -->
+                            {% if talep.durum == 'Tamamlandı' and talep.paket %}
+                                <button type="button" class="btn-apple-outline w-100" data-bs-toggle="modal" data-bs-target="#degerlendirmeModal{{ talep.id }}">
+                                    <i class="fas fa-star text-warning me-1"></i> Puan Ver
+                                </button>
+
+                                <!-- DEĞERLENDİRME MODAL -->
+                                <div class="modal fade text-start" id="degerlendirmeModal{{ talep.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content apple-modal-content">
+                                            <div class="modal-header border-0 pb-0 pt-3 px-3">
+                                                <h5 class="modal-title fw-bold text-dark" style="letter-spacing: -0.5px;">Deneyiminizi Değerlendirin</h5>
+                                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                            </div>
+                                            <form action="{% url 'yorum_yap' talep.paket.slug %}" method="POST">
+                                                {% csrf_token %}
+                                                <div class="modal-body text-center p-4">
+                                                    <p class="small mb-4" style="color: var(--apple-text-gray);"><strong class="text-dark">{{ talep.paket.isim }}</strong> hizmeti nasıldı?</p>
+                                                    
+                                                    <div class="rating-css mb-4">
+                                                        <input type="radio" value="5" id="rating5_{{ talep.id }}" name="puan" checked>
+                                                        <label for="rating5_{{ talep.id }}" class="fas fa-star"></label>
+                                                        <input type="radio" value="4" id="rating4_{{ talep.id }}" name="puan">
+                                                        <label for="rating4_{{ talep.id }}" class="fas fa-star"></label>
+                                                        <input type="radio" value="3" id="rating3_{{ talep.id }}" name="puan">
+                                                        <label for="rating3_{{ talep.id }}" class="fas fa-star"></label>
+                                                        <input type="radio" value="2" id="rating2_{{ talep.id }}" name="puan">
+                                                        <label for="rating2_{{ talep.id }}" class="fas fa-star"></label>
+                                                        <input type="radio" value="1" id="rating1_{{ talep.id }}" name="puan">
+                                                        <label for="rating1_{{ talep.id }}" class="fas fa-star"></label>
+                                                    </div>
+
+                                                    <textarea name="yorum_metni" class="form-control bg-light border-0 py-3 px-4 rounded-4" rows="3" style="box-shadow: none; outline: none; font-size: 0.95rem;" placeholder="Hizmetle ilgili düşüncelerinizi buraya yazın..." required></textarea>
+                                                </div>
+                                                <div class="modal-footer border-0 pt-0 px-3 pb-3">
+                                                    <button type="submit" class="btn-apple-primary w-100 py-3">Yorumu Gönder <i class="fas fa-paper-plane ms-2" style="font-size: 13px;"></i></button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    
+                    <!-- PAZARLIK (REVİZYON) CEVAPLAMA KUTUSU -->
+                    {% if talep.durum == 'Revize Edildi' %}
+                    <tr>
+                        <td colspan="5" class="border-bottom pb-4 pt-0">
+                            <div class="revize-alert d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                                <div class="mb-3 mb-md-0">
+                                    <h6 class="fw-bold mb-1 text-warning"><i class="fas fa-handshake me-2"></i>Firma Yeni Bir Fiyat Sundu!</h6>
+                                    <h4 class="fw-bold mb-1">{{ talep.revize_fiyat }} ₺</h4>
+                                    <span class="small opacity-75"><strong>Not:</strong> "{{ talep.revize_notu|default:'Firma not bırakmadı.' }}"</span>
+                                </div>
+                                
+                                <form method="POST" action="{% url 'musteri_revize_yanitla' talep.id %}" class="d-flex gap-2 m-0">
+                                    {% csrf_token %}
+                                    <button type="submit" name="islem" value="kabul" class="btn-apple-success">
+                                        <i class="fas fa-check me-1"></i> Kabul Et
+                                    </button>
+                                    <button type="submit" name="islem" value="red" class="btn-apple-danger">
+                                        Reddet
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="fas fa-box-open fa-3x mb-3" style="color: var(--apple-border);"></i>
+                            <p class="mb-0 text-muted fw-medium">Henüz catering talebiniz yok.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 2. CATERING TEKLİFLERİ -->
+    <div class="apple-dash-card">
+        <h3 class="fw-bold text-dark mb-4" style="font-size: 1.3rem; letter-spacing: -0.5px;">Catering Tekliflerim</h3>
+        <div class="table-responsive">
+            <table class="table apple-table">
+                <thead>
+                    <tr>
+                        <th>Firma</th>
+                        <th>Paket</th>
+                        <th>Tutar</th>
+                        <th>Geçerlilik</th>
+                        <th class="text-end">Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for teklif in catering_teklifleri %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ teklif.firma.isim|default:"Silinmiş" }}</td>
+                        <td style="color: var(--apple-text-gray);">{{ teklif.talep.paket.isim|default:"Silinmiş" }}</td>
+                        <td class="fw-bold text-dark">{{ teklif.toplam_tutar }} ₺</td>
+                        <td style="color: var(--apple-text-gray);">{{ teklif.gecerlilik_tarihi|date:"d.m.Y" }}</td>
+                        <td class="text-end">
+                            <span class="apple-badge badge-pending">{{ teklif.get_durum_display }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="fas fa-folder-open fa-3x mb-3" style="color: var(--apple-border);"></i>
+                            <p class="mb-0 text-muted fw-medium">Henüz catering teklifiniz yok.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 3. GENEL TEKLİFLER -->
+    <div class="apple-dash-card mb-0">
+        <h3 class="fw-bold text-dark mb-4" style="font-size: 1.3rem; letter-spacing: -0.5px;">Genel Teklif Taleplerim</h3>
+        <div class="table-responsive">
+            <table class="table apple-table">
+                <thead>
+                    <tr>
+                        <th>Tarih</th>
+                        <th>Etkinlik</th>
+                        <th>Kişi</th>
+                        <th class="text-end">Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for teklif in teklifler %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ teklif.olusturulma_tarihi|date:"d.m.Y" }}</td>
+                        <td style="color: var(--apple-text-gray);">{{ teklif.etkinlik_tarihi|date:"d.m.Y" }}</td>
+                        <td style="color: var(--apple-text-gray);">{{ teklif.kisi_sayisi }} Kişi</td>
+                        <td class="text-end">
+                            <span class="apple-badge badge-pending">{{ teklif.durum }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5">
+                            <i class="fas fa-comment-dots fa-3x mb-3" style="color: var(--apple-border);"></i>
+                            <p class="mb-0 text-muted fw-medium">Henüz teklif talebiniz yok.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

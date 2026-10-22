@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* APPLE GLOBAL RENKLER & TİPOGRAFİ */
+    :root {
+        --apple-dark: #1d1d1f;
+        --apple-light-bg: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-text-gray: #86868b;
+        --apple-border: #d2d2d7;
+    }
+
+    body { background-color: var(--apple-light-bg); }
+    h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.04em; }
+
+    /* APPLE PROFİL KARTI */
+    .apple-detail-card {
+        background: #ffffff;
+        border-radius: 32px;
+        padding: 50px 40px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    /* LOGO / İKON BÖLÜMÜ */
+    .apple-logo-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background-color: rgba(0, 113, 227, 0.04);
+        color: var(--apple-blue);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        margin-bottom: 24px;
+        border: 1px solid rgba(0,0,0,0.03);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+        overflow: hidden;
+    }
+
+    /* ROZETLER */
+    .apple-badge {
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 8px 18px;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .badge-rating { 
+        background: rgba(255, 159, 10, 0.1); 
+        color: #b26c00; 
+        border: 1px solid rgba(255, 159, 10, 0.2); 
+    }
+    .badge-location { 
+        background: var(--apple-light-bg); 
+        color: var(--apple-dark); 
+        border: 1px solid var(--apple-border); 
+    }
+
+    /* YENİ: APPLE WALLET STİLİ GÜVENLİK KARTLARI */
+    .wallet-card {
+        border-radius: 20px;
+        padding: 20px;
+        color: #ffffff;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 130px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .wallet-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    .wallet-card::after {
+        content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+        pointer-events: none;
+    }
+    .wallet-card-green { background: linear-gradient(135deg, #34c759 0%, #248a3d 100%); }
+    .wallet-card-blue { background: linear-gradient(135deg, #007aff 0%, #0051a8 100%); }
+    .wallet-card-orange { background: linear-gradient(135deg, #ff9500 0%, #cc7700 100%); }
+    
+    .wallet-icon { font-size: 1.8rem; margin-bottom: 12px; opacity: 0.9; }
+    .wallet-title { font-size: 1.05rem; font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; z-index: 2; }
+    .wallet-click-hint { font-size: 0.7rem; opacity: 0.7; margin-top: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* YENİ: APPLE STİLİ MODAL (AÇILIR PENCERE) */
+    .apple-modal-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        z-index: 9998; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+    }
+    .apple-modal {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%) scale(0.95);
+        background: #ffffff; width: 90%; max-width: 400px; border-radius: 28px;
+        z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.2); overflow: hidden;
+    }
+    .apple-modal.active { transform: translate(-50%, -50%) scale(1); opacity: 1; visibility: visible; }
+    .apple-modal-overlay.active { opacity: 1; visibility: visible; }
+    
+    .apple-modal-header { padding: 30px 30px 15px; text-align: center; }
+    .apple-modal-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 15px; color: white; }
+    .apple-modal-title { font-size: 1.4rem; font-weight: 800; color: var(--apple-dark); letter-spacing: -0.5px; margin-bottom: 5px; }
+    .apple-modal-body { padding: 0 30px 30px; text-align: center; color: var(--apple-text-gray); font-size: 0.95rem; line-height: 1.6; }
+    .apple-modal-close {
+        display: block; width: 100%; padding: 16px; background: var(--apple-light-bg);
+        color: var(--apple-blue); font-weight: 700; font-size: 1rem; border: none;
+        border-top: 1px solid rgba(0,0,0,0.05); transition: 0.2s;
+    }
+    .apple-modal-close:hover { background: #e8e8ed; }
+
+    /* İLETİŞİM BİLGİLERİ */
+    .contact-list { background: #ffffff; border-radius: 20px; border: 1px solid rgba(0,0,0,0.05); overflow: hidden; }
+    .contact-item { display: flex; align-items: flex-start; padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.04); transition: 0.2s; }
+    .contact-item:last-child { border-bottom: none; }
+    .contact-item:hover { background-color: #fafafa; }
+    .contact-icon { width: 44px; height: 44px; border-radius: 50%; background-color: rgba(0, 113, 227, 0.08); color: var(--apple-blue); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; margin-right: 16px; }
+    .contact-title { font-size: 0.8rem; font-weight: 600; color: var(--apple-text-gray); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .contact-value { font-size: 1rem; font-weight: 600; color: var(--apple-dark); line-height: 1.4; }
+
+    /* BUTON */
+    .btn-apple-primary {
+        background: var(--apple-blue); color: #fff !important; border-radius: 50px; padding: 16px 24px;
+        font-weight: 600; font-size: 1.05rem; transition: 0.3s; border: none; display: flex;
+        align-items: center; justify-content: center; width: 100%; text-decoration: none;
+    }
+    .btn-apple-primary:hover { background: var(--apple-blue-hover); transform: scale(1.02); box-shadow: 0 6px 20px rgba(0, 113, 227, 0.2); }
+    
+    @media (max-width: 767px) { .apple-detail-card { padding: 40px 20px; } }
+</style>
+
+<div class="container py-5 mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            
+            <!-- Geri Dön Butonu -->
+            <a href="javascript:history.back()" class="text-decoration-none fw-bold mb-4 d-inline-block" style="color: var(--apple-blue); font-size: 15px;">
+                <i class="fas fa-chevron-left me-1" style="font-size: 12px;"></i> Geri Dön
+            </a>
+
+            <div class="apple-detail-card">
+                
+                <!-- Firma Başlık ve Logo/İkon -->
+                <div class="text-center mb-5">
+                    
+                    <div class="apple-logo-circle">
+                        {% if firma.logo %}
+                            <img src="{{ firma.logo.url }}" alt="{{ firma.isim }}" style="width: 100%; height: 100%; object-fit: contain; padding: 15px;">
+                        {% else %}
+                            <i class="fas fa-building"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <h2 class="fw-bold text-dark mb-3" style="font-size: 2.2rem; letter-spacing: -1px;">{{ firma.isim }}</h2>
+                    
+                    <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                        <span class="apple-badge badge-rating">
+                            <i class="fas fa-star text-warning"></i> {{ firma.puan|default:"Yeni" }}
+                        </span>
+                        {% if firma.sehir %}
+                        <span class="apple-badge badge-location">
+                            <i class="fas fa-map-marker-alt" style="color: var(--apple-text-gray);"></i> {{ firma.sehir }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- YENİ: APPLE WALLET GÜVENLİK ROZETLERİ -->
+                <div class="mb-5">
+                    <h5 class="fw-bold text-dark mb-3" style="font-size: 1.1rem; letter-spacing: -0.5px;">Kalite ve Güvenlik Sınıfı</h5>
+                    <div class="row g-3">
+                        
+                        <!-- YemekVar Onaylı -->
+                        <div class="col-md-4 col-4">
+                            <div class="wallet-card wallet-card-green" onclick="acModal('yemekvar')">
+                                <div>
+                                    <i class="fas fa-shield-check wallet-icon"></i>
+                                    <div class="wallet-title">YemekVar<br>Onaylı</div>
+                                </div>
+                                <div class="wallet-click-hint">İncele <i class="fas fa-chevron-right ms-1"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- Tarım Bakanlığı -->
+                        <div class="col-md-4 col-4">
+                            <div class="wallet-card wallet-card-orange" onclick="acModal('tarim')">
+                                <div>
+                                    <i class="fas fa-leaf wallet-icon"></i>
+                                    <div class="wallet-title">Bakanlık<br>Kayıtlı</div>
+                                </div>
+                                <div class="wallet-click-hint">İncele <i class="fas fa-chevron-right ms-1"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- ISO 9001 -->
+                        <div class="col-md-4 col-4">
+                            <div class="wallet-card wallet-card-blue" onclick="acModal('iso')">
+                                <div>
+                                    <i class="fas fa-certificate wallet-icon"></i>
+                                    <div class="wallet-title">ISO 9001<br>Sertifikası</div>
+                                </div>
+                                <div class="wallet-click-hint">İncele <i class="fas fa-chevron-right ms-1"></i></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- İletişim ve Adres Bilgileri -->
+                <div class="mb-5">
+                    <h5 class="fw-bold text-dark mb-3" style="font-size: 1.1rem; letter-spacing: -0.5px;">İletişim Bilgileri</h5>
+                    <div class="contact-list">
+                        <div class="contact-item">
+                            <div class="contact-icon"><i class="fas fa-map-pin"></i></div>
+                            <div>
+                                <div class="contact-title">Adres</div>
+                                <div class="contact-value">{{ firma.adres }}</div>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                            <div>
+                                <div class="contact-title">Telefon</div>
+                                <div class="contact-value">{{ firma.telefon }}</div>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                            <div>
+                                <div class="contact-title">E-posta</div>
+                                <div class="contact-value">{{ firma.email }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menü İnceleme Butonu -->
+                <div>
+                    <a href="{% url 'arama' %}?q={{ firma.isim }}" class="btn-apple-primary">
+                        Firmanın Menülerini İncele <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================
+     APPLE STİLİ AÇILIR PENCERE (MODAL) ALTYAPISI
+     ========================================== -->
+<div class="apple-modal-overlay" id="modalOverlay" onclick="kapatModal()"></div>
+
+<div class="apple-modal" id="walletModal">
+    <div class="apple-modal-header">
+        <div class="apple-modal-icon" id="modalIcon"></div>
+        <h3 class="apple-modal-title" id="modalTitle">Başlık</h3>
+    </div>
+    <div class="apple-modal-body" id="modalBody">
+        İçerik buraya gelecek.
+    </div>
+    <button class="apple-modal-close" onclick="kapatModal()">Kapat</button>
+</div>
+
+<script>
+    // Modal İçerik Verileri
+    const modalVerileri = {
+        'yemekvar': {
+            title: 'YemekVar Güvencesi',
+            icon: '<i class="fas fa-shield-check"></i>',
+            color: 'linear-gradient(135deg, #34c759 0%, #248a3d 100%)',
+            text: 'Bu tedarikçi, YemekVar operasyon ekibi tarafından yerinde denetlenmiş, kalite, hijyen ve müşteri memnuniyeti standartlarımızı başarıyla geçerek platforma kabul edilmiştir.'
+        },
+        'tarim': {
+            title: 'Bakanlık Onaylı',
+            icon: '<i class="fas fa-leaf"></i>',
+            color: 'linear-gradient(135deg, #ff9500 0%, #cc7700 100%)',
+            text: 'Bu işletme, T.C. Tarım ve Orman Bakanlığı işletme kayıt belgesine sahip olup, gıda üretim ve dağıtım yasal prosedürlerine uygun olarak faaliyet göstermektedir.'
+        },
+        'iso': {
+            title: 'ISO 9001 Sertifikası',
+            icon: '<i class="fas fa-certificate"></i>',
+            color: 'linear-gradient(135deg, #007aff 0%, #0051a8 100%)',
+            text: 'Tedarikçimiz, uluslararası geçerliliği olan ISO 9001 Kalite Yönetim Sistemi sertifikasına sahiptir. Üretimden teslimata kadar tüm süreçler standartlara uygun şekilde yönetilmektedir.'
+        }
+    };
+
+    // Modal Açma Fonksiyonu
+    function acModal(tip) {
+        const veri = modalVerileri[tip];
+        
+        document.getElementById('modalTitle').innerText = veri.title;
+        document.getElementById('modalBody').innerText = veri.text;
+        
+        const modalIcon = document.getElementById('modalIcon');
+        modalIcon.innerHTML = veri.icon;
+        modalIcon.style.background = veri.color;
+
+        document.getElementById('modalOverlay').classList.add('active');
+        document.getElementById('walletModal').classList.add('active');
+    }
+
+    // Modal Kapatma Fonksiyonu
+    function kapatModal() {
+        document.getElementById('modalOverlay').classList.remove('active');
+        document.getElementById('walletModal').classList.remove('active');
+    }
+</script>
+{% endblock %}
