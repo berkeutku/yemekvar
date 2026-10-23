@@ -1,3 +1,6 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
 """
 Django settings for core project.
 
@@ -194,7 +197,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'yemekvar.sistem@gmail.com' 
-EMAIL_HOST_PASSWORD = 'hxzrmngodvyydksm'
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.dev']
 
 # --- YEMEKVAR B2B GÜVENLİK VE KORUMA AYARLARI ---
